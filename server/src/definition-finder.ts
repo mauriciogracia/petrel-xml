@@ -57,7 +57,13 @@ import { Handler } from './util';
 	}
 
 	/*
-	  MGG CodeLens -https://code.visualstudio.com/blogs/2017/02/12/code-lens-roundup
+		MGG - useful links
+
+		Overview of features - https://microsoft.github.io/language-server-protocol/overviews/lsp/overview/
+		
+		Example - https://vscode-docs.readthedocs.io/en/stable/extensions/example-language-server/
+		
+		CodeLens -https://code.visualstudio.com/blogs/2017/02/12/code-lens-roundup
 	*/
 
 }
