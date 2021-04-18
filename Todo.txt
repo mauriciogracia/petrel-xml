@@ -1,0 +1,18 @@
+
+- get current symbol to go to definition
+- update all reference when workspace is loaded/extension is init
+/ update references when current document is updated
+- clean up code (commit before)
+
+
+-------------
+	Overview of features - https://microsoft.github.io/language-server-protocol/overviews/lsp/overview/
+
+	Example - https://vscode-docs.readthedocs.io/en/stable/extensions/example-language-server/
+
+	LocationLink - https://microsoft.github.io/language-server-protocol/specification
+	
+	CodeLens -https://code.visualstudio.com/blogs/2017/02/12/code-lens-roundup
+
+	definitioProvider - https://blog.logrocket.com/how-to-use-the-language-server-protocol-to-extending-a-client-764da0e7863c/
+		

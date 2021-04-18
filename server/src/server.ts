@@ -21,6 +21,8 @@ import {
 	TextDocument
 } from 'vscode-languageserver-textdocument';
 import DefinitionFinder from './definition-finder';
+import { ReferenceManager } from './reference-manager';
+import { Console } from 'console';
 
 // Create a connection for the server, using Node's IPC as a transport.
 // Also include all preview / proposed LSP features.
@@ -28,6 +30,8 @@ const connection = createConnection(ProposedFeatures.all);
 
 // Create a simple text document manager.
 const documents: TextDocuments<TextDocument> = new TextDocuments(TextDocument);
+
+const refManager: ReferenceManager = new ReferenceManager();
 
 let hasConfigurationCapability = false;
 let hasWorkspaceFolderCapability = false;
@@ -52,9 +56,6 @@ connection.onInitialize((params: InitializeParams) => {
 
 	const result: InitializeResult = {
 		capabilities: {
-			//to navigate to definitions
-			hoverProvider: true,
-			//MGG - https://blog.logrocket.com/how-to-use-the-language-server-protocol-to-extending-a-client-764da0e7863c/
 			definitionProvider: true,
 			textDocumentSync: TextDocumentSyncKind.Incremental,
 			// Tell the client that this server supports code completion.
@@ -72,7 +73,7 @@ connection.onInitialize((params: InitializeParams) => {
 	}
 
 	const definitionFinder = new DefinitionFinder(
-		connection
+		connection, refManager
 		/*, this.converter, featureFinder,
 		analyzerSynchronizer.analyzer, this.settings*/);
 	
@@ -114,9 +115,10 @@ connection.onDidChangeConfiguration(change => {
 			(change.settings.languageServerExample || defaultSettings)
 		);
 	}
-
+	
 	// Revalidate all open text documents
 	documents.all().forEach(validateDocument);
+	
 });
 
 function getDocumentSettings(resource: string): Thenable<ExampleSettings> {
@@ -142,20 +144,14 @@ documents.onDidClose(e => {
 // The content of a text document has changed. This event is emitted
 // when the text document first opened or when its content has changed.
 documents.onDidChangeContent(change => {
+	refManager.update(change.document);
 	validateDocument(change.document);
 });
 
-/* MGG - todo
-connection.onDefinition((textDocumentIdentifier: TextDocumentIdentifier): Definition => {
-    return Location.create(textDocumentIdentifier.uri, {
-        start: { line: 2, character: 5 },
-        end: { line: 2, character: 6 }
-    });
-});
-*/
-
 async function validateDocument(textDocument: TextDocument) {
 	const diagnostics: Diagnostic[] = [];
+
+	console.log("validateDocument");
 
 	await customValidation(textDocument, diagnostics);
 	await validateTextDocument(textDocument, diagnostics);
