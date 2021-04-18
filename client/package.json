@@ -1,8 +1,8 @@
 {
-	"name": "lsp-sample-client",
-	"description": "VSCode part of a language server",
-	"author": "Microsoft Corporation",
-	"license": "MIT",
+	"name": "petrel-xml",
+	"description": "Extension for Petrel XML files",
+	"author": "Mauricio Gracia Gutiérrez - mgg.isco@gmail.com",
+	"license": "GNU/GPL",
 	"version": "0.0.1",
 	"publisher": "vscode",
 	"repository": {

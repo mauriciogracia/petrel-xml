@@ -1,8 +1,9 @@
 
 - get current symbol to go to definition
+- return empty location for symbols that are not found
 - update all reference when workspace is loaded/extension is init
 / update references when current document is updated
-- clean up code (commit before)
+X remove warnings example
 
 
 -------------

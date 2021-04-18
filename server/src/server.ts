@@ -14,7 +14,8 @@ import {
 	CompletionItemKind,
 	TextDocumentPositionParams,
 	TextDocumentSyncKind,
-	InitializeResult
+	InitializeResult,
+	VersionedTextDocumentIdentifier
 } from 'vscode-languageserver/node';
 
 import {
@@ -71,11 +72,7 @@ connection.onInitialize((params: InitializeParams) => {
 			}
 		};
 	}
-
-	const definitionFinder = new DefinitionFinder(
-		connection, refManager
-		/*, this.converter, featureFinder,
-		analyzerSynchronizer.analyzer, this.settings*/);
+	const definitionFinder = new DefinitionFinder(connection, refManager);
 	
 	return result;
 });
@@ -117,7 +114,7 @@ connection.onDidChangeConfiguration(change => {
 	}
 	
 	// Revalidate all open text documents
-	documents.all().forEach(validateDocument);
+	//documents.all().forEach(validateDocument);
 	
 });
 
@@ -145,13 +142,16 @@ documents.onDidClose(e => {
 // when the text document first opened or when its content has changed.
 documents.onDidChangeContent(change => {
 	refManager.update(change.document);
-	validateDocument(change.document);
+	//MGG usefull for document validation -
+	//validateDocument(change.document);
 });
 
+/**
+ * Example on how to produce warning/problems for a given file 
+ * @param textDocument 
+ */
 async function validateDocument(textDocument: TextDocument) {
 	const diagnostics: Diagnostic[] = [];
-
-	console.log("validateDocument");
 
 	await customValidation(textDocument, diagnostics);
 	await validateTextDocument(textDocument, diagnostics);

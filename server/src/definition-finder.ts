@@ -31,7 +31,7 @@ import { Handler } from './util';
 	 * https://github.com/Microsoft/language-server-protocol/blob/master/protocol.md#textDocument_definition
 	 */
 	private async getDefinition(textPosition: TextDocumentPositionParams): Promise<Location[]> {
-		const text = "ruleABC";
+		const text = "funABC";
 		return this.refManager.getDefinitionLocations(text);
 	}
 }

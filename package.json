@@ -1,9 +1,9 @@
 {
 	"name": "petrel-xml",
-	"description": "Extension for XML files of Petrel",
-	"author": "Mauricio Gracia Gutiérrez",
+	"description": "Extension for Petrel XML files",
+	"author": "Mauricio Gracia Gutiérrez - mgg.isco@gmail.com",
 	"license": "GNU/GPL",
-	"version": "1.0.0",
+	"version": "0.0.1",
 	"categories": [],
 	"keywords": [
 		"multi-root ready"
