@@ -20,6 +20,7 @@ import {
 import {
 	TextDocument
 } from 'vscode-languageserver-textdocument';
+import DefinitionFinder from './definition-finder';
 
 // Create a connection for the server, using Node's IPC as a transport.
 // Also include all preview / proposed LSP features.
@@ -52,6 +53,8 @@ connection.onInitialize((params: InitializeParams) => {
 	const result: InitializeResult = {
 		capabilities: {
 			//to navigate to definitions
+			hoverProvider: true,
+			//MGG - https://blog.logrocket.com/how-to-use-the-language-server-protocol-to-extending-a-client-764da0e7863c/
 			definitionProvider: true,
 			textDocumentSync: TextDocumentSyncKind.Incremental,
 			// Tell the client that this server supports code completion.
@@ -67,6 +70,12 @@ connection.onInitialize((params: InitializeParams) => {
 			}
 		};
 	}
+
+	const definitionFinder = new DefinitionFinder(
+		connection
+		/*, this.converter, featureFinder,
+		analyzerSynchronizer.analyzer, this.settings*/);
+	
 	return result;
 });
 
@@ -136,7 +145,7 @@ documents.onDidChangeContent(change => {
 	validateDocument(change.document);
 });
 
-/*
+/* MGG - todo
 connection.onDefinition((textDocumentIdentifier: TextDocumentIdentifier): Definition => {
     return Location.create(textDocumentIdentifier.uri, {
         start: { line: 2, character: 5 },
