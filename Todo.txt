@@ -3,6 +3,10 @@
 - return empty location for symbols that are not found
 - update all reference when workspace is loaded/extension is init
 / update references when current document is updated
+	X process line by line
+	- handle different scenarios
+	- keep line number 
+	
 X remove warnings example
 
 
