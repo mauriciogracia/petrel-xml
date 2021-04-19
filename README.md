@@ -20,7 +20,10 @@ Navigate to functions and rules definitions from where they are being used
         └── server.ts // Language Server entry point
 ```
 
-## Running the Sample
+## Installing 
+- TODO.....
+
+## Running and Debugging
 
 - Run `npm install` in this folder. This installs all necessary npm modules in both the client and server folder
 - Open VS Code on this folder.
