@@ -26,12 +26,15 @@ export class ReferenceManager {
 		// Note: we use the crlfDelay option to recognize all instances of CR LF
 		// ('\r\n') in input.txt as a single line break.
 	
+		
 		rl.on('line', (line) => {
-			if (line.includes("<function")
-				|| line.includes("<rule")) {
-					console.log(`declaration: ${line}`);
-				}
-			
+			if (line.includes("<function ") || line.includes("<rule ")) {
+				this.getAttributeValueXML("name", line);
+				console.log(`declaration: ${line}`);	
+			}
+			else if (line.includes("<action ")) {
+				console.log(`reference: ${line}`);
+			}
 		});
 
 		/*************  testing below */
@@ -40,6 +43,24 @@ export class ReferenceManager {
 
 		pr = new ProjectReference("funABC", ReferenceType.Function, txtDoc.uri, 24, true);
 		this.refs.push(pr);
+	}
+
+	public getAttributeValueXML(attributeName: string, line: string): string {
+		const resp = '';
+
+		//extract the tokens from a single XML line
+		const tokens = line.split(/[\t= <>"]/).filter(x => x);
+		
+		const attIndex = tokens.indexOf(attributeName);
+		
+		if ((attIndex > 0) && (attIndex < tokens.length-1))
+		{
+			console.log(tokens[attIndex+1]);
+		}
+
+		console.log(tokens);
+		
+		return resp;
 	}
 
 	public getDefinitionLocations(text: string): Location[]
