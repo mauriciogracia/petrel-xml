@@ -14,8 +14,7 @@ import {
 	CompletionItemKind,
 	TextDocumentPositionParams,
 	TextDocumentSyncKind,
-	InitializeResult,
-	VersionedTextDocumentIdentifier
+	InitializeResult
 } from 'vscode-languageserver/node';
 
 import {
@@ -113,7 +112,7 @@ connection.onDidChangeConfiguration(change => {
 		);
 	}
 	
-	// Revalidate all open text documents
+	// MGG - Revalidate all open text documents
 	//documents.all().forEach(validateDocument);
 	
 });
