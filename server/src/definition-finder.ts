@@ -8,11 +8,13 @@ import { Handler } from './util';
 /**
  * Gets the definition of a feature at a position.
  */
- export default class DefinitionFinder extends Handler {
+export default class DefinitionFinder extends Handler {
+	
+	
 	constructor(
 		protected connection: Connection,
 		private refManager: ReferenceManager,
-		private documents: TextDocuments<TextDocument>)
+		)
 	{
 		super();
 
@@ -34,24 +36,12 @@ import { Handler } from './util';
 	 */
 	private async getDefinition(textPosition: TextDocumentPositionParams): Promise<Location[]> {
 
-		const symbol = this.getSymbolAtPosition(textPosition);
+		const symbol = this.refManager.getSymbolAtPosition(textPosition);
 
 		console.log(`symbol: ${symbol}`);
 
 		return this.refManager.getDefinitionLocations(symbol);
 	}
 	
-	private getSymbolAtPosition(textPosition: TextDocumentPositionParams):string {
-		const range = {
-			start: { line: textPosition.position.line, character: 0},
-			end: { line: textPosition.position.line, character: Number.MAX_VALUE  }
-		};
-		//get the whole line 
-		const line = this.documents.get(textPosition.textDocument.uri)?.getText(range) || '';
-		const symbol = line;
-
-		console.log(`line: ${line}`);
-
-		return symbol;
-	}
+	
 }

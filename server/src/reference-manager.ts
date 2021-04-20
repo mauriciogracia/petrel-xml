@@ -1,15 +1,25 @@
 import { ProjectReference } from './project-reference';
 import { ReferenceType } from "./reference-type";
 import { TextDocument } from 'vscode-languageserver-textdocument';
-import { Location } from 'vscode-languageserver';
+import { Location, TextDocumentPositionParams, TextDocuments } from 'vscode-languageserver';
 import fs = require('fs');
 import readline = require('readline');
 import { sep } from 'path';
 import { fileURLToPath, URL } from 'url';
+import DefinitionFinder from './definition-finder';
 
 export class ReferenceManager {
 	refs: ProjectReference[] = [];
+
+	//reg expresion that matches any of the XML elements
+	public TokenSeparatorsXML = /[\t= <>"]/;
 	
+	constructor(
+		private documents: TextDocuments<TextDocument>)
+	{ }
+
+	
+
 	public async update(txtDoc: TextDocument) {
 
 		const url = new URL(txtDoc.uri);
@@ -60,11 +70,38 @@ export class ReferenceManager {
 		});
 	}
 
+	public getSymbolAtPosition(textPosition: TextDocumentPositionParams):string {
+		const range = {
+			start: { line: textPosition.position.line, character: 0},
+			end: { line: textPosition.position.line, character: Number.MAX_VALUE  }
+		};
+		//get the whole line 
+		const line = this.documents.get(textPosition.textDocument.uri)?.getText(range) || '';
+
+		let start = textPosition.position.character;
+		while ((start > 0) && !line[start].match(this.TokenSeparatorsXML))
+		{
+			start--;
+		}
+
+		let end = textPosition.position.character;
+		while ((end < line.length) && !line[end].match(this.TokenSeparatorsXML))
+		{
+			end++;
+		}
+
+		const symbol = line.substr(start+1, end-start-1);
+
+		console.log(`line: ${line}`);
+
+		return symbol;
+	}
+
 	public getAttributeValueXML(attributeName: string, line: string): string {
 		let resp = '';
 
 		//extract the tokens from a single XML line
-		const tokens = line.split(/[\t= <>"]/).filter(x => x);
+		const tokens = line.split(this.TokenSeparatorsXML).filter(x => x);
 		
 		//look up the attribute by name and get the next token
 		const attIndex = tokens.indexOf(attributeName);
@@ -79,6 +116,7 @@ export class ReferenceManager {
 		
 		return resp;
 	}
+	
 
 	public getDefinitionLocations(text: string): Location[]
 	{

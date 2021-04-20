@@ -1,12 +1,17 @@
 
-- get current symbol to go to definition
-- return empty location for symbols that are not found
-- update all reference when workspace is loaded/extension is init
+X get current symbol to go to definition
+X return empty location for symbols that are not found
+- update all reference when workspace is loaded/extension is inited
 / update references when current document is updated
 	X process line by line
 	X handle different scenarios
 	X keep line number
-	- Change the document and see if line references update 
+	/ Change the document and see if line references update 
+		- remove all references of the updated document 
+- definitions for
+	- set-var
+	- include blocks
+	- infosets
 
 X remove warnings example
 

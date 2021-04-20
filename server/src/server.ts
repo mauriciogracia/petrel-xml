@@ -30,7 +30,9 @@ const connection = createConnection(ProposedFeatures.all);
 // Create a simple text document manager.
 const documents: TextDocuments<TextDocument> = new TextDocuments(TextDocument);
 
-const refManager: ReferenceManager = new ReferenceManager();
+const refManager: ReferenceManager = new ReferenceManager(documents);
+
+const definitionFinder = new DefinitionFinder(connection, refManager);
 
 let hasConfigurationCapability = false;
 let hasWorkspaceFolderCapability = false;
@@ -70,7 +72,7 @@ connection.onInitialize((params: InitializeParams) => {
 			}
 		};
 	}
-	const definitionFinder = new DefinitionFinder(connection, refManager, documents);
+	
 	
 	return result;
 });
