@@ -22,7 +22,6 @@ import {
 } from 'vscode-languageserver-textdocument';
 import DefinitionFinder from './definition-finder';
 import { ReferenceManager } from './reference-manager';
-import { Console } from 'console';
 
 // Create a connection for the server, using Node's IPC as a transport.
 // Also include all preview / proposed LSP features.
@@ -71,7 +70,7 @@ connection.onInitialize((params: InitializeParams) => {
 			}
 		};
 	}
-	const definitionFinder = new DefinitionFinder(connection, refManager);
+	const definitionFinder = new DefinitionFinder(connection, refManager, documents);
 	
 	return result;
 });

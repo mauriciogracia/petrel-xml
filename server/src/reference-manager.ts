@@ -26,36 +26,53 @@ export class ReferenceManager {
 		// Note: we use the crlfDelay option to recognize all instances of CR LF
 		// ('\r\n') in input.txt as a single line break.
 	
-		
+		let name:string;
+		let lineNumber = 1;
+		let isDeclaration: boolean;
+		let createReference: boolean;
+		let refType: ReferenceType;
+			
 		rl.on('line', (line) => {
 			if (line.includes("<function ") || line.includes("<rule ")) {
-				this.getAttributeValueXML("name", line);
-				console.log(`declaration: ${line}`);	
+				//Determine if it's a rule/function definition 
+				refType = line.includes("<rule ") ? ReferenceType.Rule : ReferenceType.Function;
+				name = this.getAttributeValueXML("name", line);
+				createReference = (name !== '');
+				isDeclaration = true;
 			}
 			else if (line.includes("<action ")) {
-				console.log(`reference: ${line}`);
+				refType = ReferenceType.Call;
+				name = this.getAttributeValueXML("name", line);
+				createReference = (name !== '');
+				isDeclaration = false;
 			}
+			else {
+				createReference = false;
+			}
+
+			if (createReference) {
+				const pr: ProjectReference = new ProjectReference(refType, name, isDeclaration, txtDoc.uri, lineNumber);
+				this.refs.push(pr);
+				console.log(pr);
+			}
+
+			lineNumber++;
 		});
-
-		/*************  testing below */
-		let pr: ProjectReference = new ProjectReference("ruleABC", ReferenceType.Rule, txtDoc.uri, 2, true);
-		this.refs.push(pr);
-
-		pr = new ProjectReference("funABC", ReferenceType.Function, txtDoc.uri, 24, true);
-		this.refs.push(pr);
 	}
 
 	public getAttributeValueXML(attributeName: string, line: string): string {
-		const resp = '';
+		let resp = '';
 
 		//extract the tokens from a single XML line
 		const tokens = line.split(/[\t= <>"]/).filter(x => x);
 		
+		//look up the attribute by name and get the next token
 		const attIndex = tokens.indexOf(attributeName);
 		
 		if ((attIndex > 0) && (attIndex < tokens.length-1))
 		{
-			console.log(tokens[attIndex+1]);
+			resp = tokens[attIndex + 1];
+			console.log(resp);
 		}
 
 		console.log(tokens);

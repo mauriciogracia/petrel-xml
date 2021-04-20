@@ -4,9 +4,10 @@
 - update all reference when workspace is loaded/extension is init
 / update references when current document is updated
 	X process line by line
-	- handle different scenarios
-	- keep line number 
-	
+	X handle different scenarios
+	X keep line number
+	- Change the document and see if line references update 
+
 X remove warnings example
 
 
@@ -20,4 +21,5 @@ X remove warnings example
 	CodeLens -https://code.visualstudio.com/blogs/2017/02/12/code-lens-roundup
 
 	definitioProvider - https://blog.logrocket.com/how-to-use-the-language-server-protocol-to-extending-a-client-764da0e7863c/
-		
+	
+	fast xml parser - https://www.npmjs.com/package/fast-xml-parser

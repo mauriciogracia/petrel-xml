@@ -1,5 +1,6 @@
 //import {CodeLens, CodeLensParams, Definition, Connection, Location, ReferenceParams, SymbolInformation, SymbolKind} from 'vscode-languageserver';
-import {Definition, Connection, Location, ReferenceParams, TextDocumentPositionParams, Range} from 'vscode-languageserver';
+import { Definition, Connection, Location, ReferenceParams, TextDocumentPositionParams, Range, TextDocuments } from 'vscode-languageserver';
+import { TextDocument } from 'vscode-languageserver-textdocument';
 import { ReferenceManager } from './reference-manager';
 
 import { Handler } from './util';
@@ -10,7 +11,8 @@ import { Handler } from './util';
  export default class DefinitionFinder extends Handler {
 	constructor(
 		protected connection: Connection,
-		private refManager: ReferenceManager)
+		private refManager: ReferenceManager,
+		private documents: TextDocuments<TextDocument>)
 	{
 		super();
 
@@ -31,7 +33,25 @@ import { Handler } from './util';
 	 * https://github.com/Microsoft/language-server-protocol/blob/master/protocol.md#textDocument_definition
 	 */
 	private async getDefinition(textPosition: TextDocumentPositionParams): Promise<Location[]> {
-		const text = "funABC";
-		return this.refManager.getDefinitionLocations(text);
+
+		const symbol = this.getSymbolAtPosition(textPosition);
+
+		console.log(`symbol: ${symbol}`);
+
+		return this.refManager.getDefinitionLocations(symbol);
+	}
+	
+	private getSymbolAtPosition(textPosition: TextDocumentPositionParams):string {
+		const range = {
+			start: { line: textPosition.position.line, character: 0},
+			end: { line: textPosition.position.line, character: Number.MAX_VALUE  }
+		};
+		//get the whole line 
+		const line = this.documents.get(textPosition.textDocument.uri)?.getText(range) || '';
+		const symbol = line;
+
+		console.log(`line: ${line}`);
+
+		return symbol;
 	}
 }

@@ -2,24 +2,26 @@ import { ReferenceType } from './reference-type';
 
 
 export class ProjectReference {
-	name: string;
 	type: ReferenceType; 
-	fileUri: string 
-	line: number;
+	name: string;
 	isDeclaration: boolean;
+	fileUri: string
+	line: number;
+	
 
-	constructor(name: string,
+	constructor(
 		type: ReferenceType,
+		name: string,
+		isDeclaration: boolean,
 		fileUri: string,
-		line: number,
-		isDeclaration: boolean) {
+		line: number)
+	{
 		
 		this.name = name;
 		this.type = type;
 		this.fileUri = fileUri;
 		this.line = line;
 		this.isDeclaration = isDeclaration;
-
 	}
 }
 
