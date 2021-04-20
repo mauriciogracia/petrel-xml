@@ -18,11 +18,11 @@ export class ReferenceManager {
 		private documents: TextDocuments<TextDocument>)
 	{ }
 
-	
-
 	public async update(txtDoc: TextDocument) {
 
 		const url = new URL(txtDoc.uri);
+
+		this.removeAllDocumentReferences(txtDoc.uri);
 
 		const filePath = fileURLToPath(url);
 
@@ -70,6 +70,11 @@ export class ReferenceManager {
 		});
 	}
 
+	public removeAllDocumentReferences(docUri: string)
+	{
+		//keep references for all documents that are not the especified by docUri 
+		this.refs = this.refs.filter(r => r.fileUri != docUri);
+	}
 	public getSymbolAtPosition(textPosition: TextDocumentPositionParams):string {
 		const range = {
 			start: { line: textPosition.position.line, character: 0},
