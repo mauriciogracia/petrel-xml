@@ -1,12 +1,13 @@
 import { ProjectReference } from './project-reference';
 import { ReferenceType } from "./reference-type";
-import { Location, LocationLink, TextDocumentPositionParams, TextDocuments } from 'vscode-languageserver';
+import { Location, LocationLink, ReferenceParams, TextDocumentPositionParams, TextDocuments } from 'vscode-languageserver';
 import fs = require('fs');
 import readline = require('readline');
 import { fileURLToPath, URL } from 'url';
-import { TextDocument } from 'vscode-languageserver-textdocument';
+import { Position, TextDocument } from 'vscode-languageserver-textdocument';
 
 export class ReferenceManager {
+	
 	refs: ProjectReference[] = [];
 
 	//reg expresion that matches any of the XML elements
@@ -50,7 +51,10 @@ export class ReferenceManager {
 			}
 			else if (line.includes("<action ")) {
 				refType = ReferenceType.Call;
-				name = this.getAttributeValueXML("name", line);
+				name = this.getAttributeValueXML("rulename", line);
+				if (name.length == 0) { 
+					name = this.getAttributeValueXML("function", line);
+				}
 				createReference = (name !== '');
 				isDeclaration = false;
 			}
@@ -73,25 +77,24 @@ export class ReferenceManager {
 		//keep references for all documents that are not the especified by docUri 
 		this.refs = this.refs.filter(r => r.fileUri != docUri);
 	}
-	public getSymbolAtPosition(textPosition: TextDocumentPositionParams): string {
-		const doc:TextDocument = this.documents.get(textPosition.textDocument.uri)!;
+	public getSymbolAtPosition(position: Position, documentUri: string): string {
 
-		console.log(textPosition);
+		console.log(position);
 
 		const range = {
-			start: { line: textPosition.position.line, character: 0},
-			end: { line: textPosition.position.line, character: Number.MAX_VALUE  }
+			start: { line: position.line, character: 0},
+			end: { line: position.line, character: Number.MAX_VALUE  }
 		};
 		//get the whole line 
-		const line = this.documents.get(textPosition.textDocument.uri)?.getText(range) || '';
+		const line = this.documents.get(documentUri)?.getText(range) || '';
 
-		let start = textPosition.position.character;
+		let start = position.character;
 		while ((start > 0) && !line[start].match(this.TokenSeparatorsXML))
 		{
 			start--;
 		}
 
-		let end = textPosition.position.character;
+		let end = position.character;
 		while ((end < line.length) && !line[end].match(this.TokenSeparatorsXML))
 		{
 			end++;
@@ -110,15 +113,25 @@ export class ReferenceManager {
 		let resp = '';
 
 		//extract the tokens from a single XML line
-		const tokens = line.split(this.TokenSeparatorsXML).filter(x => x);
+		const tokens: string[] = line.split(this.TokenSeparatorsXML).filter(x => x);
 		
 		//look up the attribute by name and get the next token
-		const attIndex = tokens.indexOf(attributeName);
+		let attIndex = tokens.indexOf(attributeName);
 		
 		if ((attIndex > 0) && (attIndex < tokens.length-1))
 		{
-			resp = tokens[attIndex + 1];
-			console.log(resp);
+			/* To handle this case : 
+			<action name="function" function="funABC" >
+			*/
+			if (tokens[attIndex - 1].toLowerCase() === "name") {
+				attIndex = tokens.indexOf(attributeName,attIndex+1);
+			}
+
+			if ((attIndex > 0) && (attIndex < tokens.length - 1)) {
+			
+				resp = tokens[attIndex + 1];
+				console.log(resp);
+			}
 		}
 
 		console.log(tokens);
@@ -126,6 +139,17 @@ export class ReferenceManager {
 		return resp;
 	}
 	
+
+	public getReferences(text: string): Location[] {
+		const defLocs = this.refs.filter(r => r.name.toUpperCase() == text.trim().toUpperCase())
+			.map((pr) =>
+			{
+				return this.ReferenceToLocation(pr);
+			}
+		);
+
+		return defLocs;
+	}
 
 	public getDefinitionLocations(text: string): Location[]
 	{

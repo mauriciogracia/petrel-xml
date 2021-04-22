@@ -58,6 +58,7 @@ connection.onInitialize((params: InitializeParams) => {
 	const result: InitializeResult = {
 		capabilities: {
 			definitionProvider: true,
+			referencesProvider: true,
 			textDocumentSync: TextDocumentSyncKind.Incremental,
 			// Tell the client that this server supports code completion.
 			completionProvider: {

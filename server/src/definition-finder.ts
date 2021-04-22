@@ -23,10 +23,12 @@ export default class DefinitionFinder extends Handler {
 				this.getDefinitionLink(textPosition), undefined) as Promise<LocationLink[]>;
 		});
 
-		// this.connection.onReferences(async (params) => {
-		// 	return this.handleErrors(this.getReferences(params), []);
-		// });
+		this.connection.onReferences(async (params) => {
+			return this.handleErrors(
+				this.getReferences(params), []) as Promise<Location[]>;
+		});
 	}
+	
 	/**
 	 * Return the location or locations where the symbol referenced at the given
 	 * location is defined.
@@ -35,14 +37,20 @@ export default class DefinitionFinder extends Handler {
 	 * https://github.com/Microsoft/language-server-protocol/blob/master/protocol.md#textDocument_definition
 	 */
 	private async getDefinition(textPosition: TextDocumentPositionParams): Promise<Location[]> {
-		const symbol = this.refManager.getSymbolAtPosition(textPosition);
+		const symbol = this.refManager.getSymbolAtPosition(textPosition.position, textPosition.textDocument.uri);
 
 		return this.refManager.getDefinitionLocations(symbol);
 	}
 	
 	private async getDefinitionLink(textPosition: TextDocumentPositionParams): Promise<LocationLink[]> {
-		const symbol = this.refManager.getSymbolAtPosition(textPosition);
+		const symbol = this.refManager.getSymbolAtPosition(textPosition.position, textPosition.textDocument.uri);
 
 		return this.refManager.getDefinitionLink(symbol);
+	}
+
+	private async getReferences(params: ReferenceParams): Promise<Location[] | import("vscode-languageserver").ResponseError<void> | null | undefined> {
+		const symbol = this.refManager.getSymbolAtPosition(params.position, params.textDocument.uri);
+
+		return this.refManager.getReferences(symbol);
 	}
 }
