@@ -122,6 +122,8 @@ export class ReferenceManager {
 		{
 			/* To handle this case : 
 			<action name="function" function="funABC" >
+
+			We need the function name...and not the value ("function") 
 			*/
 			if (tokens[attIndex - 1].toLowerCase() === "name") {
 				attIndex = tokens.indexOf(attributeName,attIndex+1);
