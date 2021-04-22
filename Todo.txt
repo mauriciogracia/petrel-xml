@@ -11,7 +11,11 @@ X remove warnings from extension example
 		/ remove all references of the updated document (verify if this is working)
 		- new added rules/functions are not being detected
 
+X Provide LocationLink for definitions (CTRL + click)
+
 - update all reference when workspace is loaded/extension is inited
+
+- suggest "All references" not just "Definitions"
 
 - definitions for
 	- set-var
@@ -19,15 +23,19 @@ X remove warnings from extension example
 	- infosets
 	- other petrel xml tags
 
+- Publish the extension - https://code.visualstudio.com/api/working-with-extensions/publishing-extension
+
 -------------
 	Overview of features - https://microsoft.github.io/language-server-protocol/overviews/lsp/overview/
 
 	Example - https://vscode-docs.readthedocs.io/en/stable/extensions/example-language-server/
 
 	LocationLink - https://microsoft.github.io/language-server-protocol/specification
-	
-	CodeLens -https://code.visualstudio.com/blogs/2017/02/12/code-lens-roundup
 
+>>>	GoToDefinitions with links - https://tomassetti.me/go-to-definition-in-the-language-server-protocol/
+	
 	definitioProvider - https://blog.logrocket.com/how-to-use-the-language-server-protocol-to-extending-a-client-764da0e7863c/
 	
 	fast xml parser - https://www.npmjs.com/package/fast-xml-parser
+
+	CodeLens -https://code.visualstudio.com/blogs/2017/02/12/code-lens-roundup

@@ -1,12 +1,10 @@
 import { ProjectReference } from './project-reference';
 import { ReferenceType } from "./reference-type";
-import { TextDocument } from 'vscode-languageserver-textdocument';
-import { Location, TextDocumentPositionParams, TextDocuments } from 'vscode-languageserver';
+import { Location, LocationLink, TextDocumentPositionParams, TextDocuments } from 'vscode-languageserver';
 import fs = require('fs');
 import readline = require('readline');
-import { sep } from 'path';
 import { fileURLToPath, URL } from 'url';
-import DefinitionFinder from './definition-finder';
+import { TextDocument } from 'vscode-languageserver-textdocument';
 
 export class ReferenceManager {
 	refs: ProjectReference[] = [];
@@ -75,7 +73,11 @@ export class ReferenceManager {
 		//keep references for all documents that are not the especified by docUri 
 		this.refs = this.refs.filter(r => r.fileUri != docUri);
 	}
-	public getSymbolAtPosition(textPosition: TextDocumentPositionParams):string {
+	public getSymbolAtPosition(textPosition: TextDocumentPositionParams): string {
+		const doc:TextDocument = this.documents.get(textPosition.textDocument.uri)!;
+
+		console.log(textPosition);
+
 		const range = {
 			start: { line: textPosition.position.line, character: 0},
 			end: { line: textPosition.position.line, character: Number.MAX_VALUE  }
@@ -97,7 +99,9 @@ export class ReferenceManager {
 
 		const symbol = line.substr(start+1, end-start-1);
 
-		console.log(`line: ${line}`);
+		console.log(`line: ${line}`) ;
+		console.log(`${start}->${end}`);
+		console.log(`symbol: ${symbol}`);
 
 		return symbol;
 	}
@@ -135,6 +139,18 @@ export class ReferenceManager {
 		return defLocs;
 	}
 
+	public getDefinitionLink(text: string): LocationLink[]
+	{
+		const defLocs = this.refs.filter(r => (r.isDeclaration == true) && r.name.toUpperCase() == text.trim().toUpperCase())
+			.map((pr) =>
+			{
+				return this.ReferenceToLocationLink(pr);
+			}
+		);
+
+		return defLocs;
+	}
+
 	public ReferenceToLocation(pr: ProjectReference): Location {
 		const loc: Location = {
 			range: {
@@ -144,6 +160,28 @@ export class ReferenceManager {
 			uri: pr.fileUri ,
 		};
 		return loc;
+	}
+
+	public ReferenceToLocationLink(pr: ProjectReference): LocationLink {
+		const locLink: LocationLink = {
+			targetRange: {
+				start: { line: pr.line-1, character: 0 },
+				end : { line: pr.line, character : 0 }
+			},
+			targetSelectionRange:
+			{
+				start: { line: pr.line-1, character: 0 },
+				end : { line: pr.line, character : 0 }
+			},
+			targetUri: pr.fileUri,
+			/* the API by default selects the word as the origin range and adds the link to it
+			originSelectionRange: {
+				start: { line: textPosition.position.line, character: textPosition.position.character-5 },
+				end : { line: textPosition.position.line, character: textPosition.position.character+5 }
+			}
+			*/
+		};
+		return locLink;
 	}
 }
 

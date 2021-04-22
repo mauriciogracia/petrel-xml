@@ -1,5 +1,5 @@
 //import {CodeLens, CodeLensParams, Definition, Connection, Location, ReferenceParams, SymbolInformation, SymbolKind} from 'vscode-languageserver';
-import { Definition, Connection, Location, ReferenceParams, TextDocumentPositionParams, Range, TextDocuments } from 'vscode-languageserver';
+import { Definition, Connection, Location, ReferenceParams, TextDocumentPositionParams, Range, TextDocuments, LocationLink } from 'vscode-languageserver';
 import { TextDocument } from 'vscode-languageserver-textdocument';
 import { ReferenceManager } from './reference-manager';
 
@@ -20,7 +20,7 @@ export default class DefinitionFinder extends Handler {
 
 		this.connection.onDefinition(async (textPosition) => {
 			return this.handleErrors(
-				this.getDefinition(textPosition), undefined) as Promise<Definition>;
+				this.getDefinitionLink(textPosition), undefined) as Promise<LocationLink[]>;
 		});
 
 		// this.connection.onReferences(async (params) => {
@@ -35,13 +35,14 @@ export default class DefinitionFinder extends Handler {
 	 * https://github.com/Microsoft/language-server-protocol/blob/master/protocol.md#textDocument_definition
 	 */
 	private async getDefinition(textPosition: TextDocumentPositionParams): Promise<Location[]> {
-
 		const symbol = this.refManager.getSymbolAtPosition(textPosition);
-
-		console.log(`symbol: ${symbol}`);
 
 		return this.refManager.getDefinitionLocations(symbol);
 	}
 	
-	
+	private async getDefinitionLink(textPosition: TextDocumentPositionParams): Promise<LocationLink[]> {
+		const symbol = this.refManager.getSymbolAtPosition(textPosition);
+
+		return this.refManager.getDefinitionLink(symbol);
+	}
 }
