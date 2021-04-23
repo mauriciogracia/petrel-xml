@@ -19,7 +19,7 @@ X update all reference when workspace is loaded/extension is inited
 
 - Avoid updating references when the file is just opened (only when updated)
 
-- Also detectes definitions and usages for:
+- Also detect definitions and usages for:
 	- set-var
 	- include blocks
 	- infosets
