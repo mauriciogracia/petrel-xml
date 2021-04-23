@@ -13,14 +13,15 @@ X remove warnings from extension example
 
 X Provide LocationLink for definitions (CTRL + click)
 
-- update all reference when workspace is loaded/extension is inited
+X suggest "All references" not just "Definitions"
 
-- suggest "All references" not just "Definitions"
+- update all reference when workspace is loaded/extension is inited
 
 - definitions for
 	- set-var
 	- include blocks
 	- infosets
+	- output (they behave as variable declarations)
 	- other petrel xml tags
 
 - Publish the extension - https://code.visualstudio.com/api/working-with-extensions/publishing-extension

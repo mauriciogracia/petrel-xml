@@ -5,17 +5,23 @@ import fs = require('fs');
 import readline = require('readline');
 import { fileURLToPath, URL } from 'url';
 import { Position, TextDocument } from 'vscode-languageserver-textdocument';
+import { WorkspaceFolder } from "vscode-languageserver/node";
 
 export class ReferenceManager {
 	
 	refs: ProjectReference[] = [];
-
-	//reg expresion that matches any of the XML elements
+	projectFolder = '';
+	//reg expresion that matches the XML elements relevant to this extension
 	public TokenSeparatorsXML = /[\t= <>"]/;
 	
 	constructor(
 		private documents: TextDocuments<TextDocument>)
 	{ }
+
+	public async updateWorkspaceReferences(workspaceFolders: WorkspaceFolder[]) {
+		this.projectFolder = workspaceFolders[0].uri;
+		console.log(this.projectFolder);
+	}
 
 	public async update(txtDoc: TextDocument) {
 
@@ -40,7 +46,9 @@ export class ReferenceManager {
 		let isDeclaration: boolean;
 		let createReference: boolean;
 		let refType: ReferenceType;
-			
+		
+		console.log(`projectFolder: ${this.projectFolder}`);
+		
 		rl.on('line', (line) => {
 			if (line.includes("<function ") || line.includes("<rule ")) {
 				//Determine if it's a rule/function definition 
@@ -63,9 +71,9 @@ export class ReferenceManager {
 			}
 
 			if (createReference) {
-				const pr: ProjectReference = new ProjectReference(refType, name, isDeclaration, txtDoc.uri, lineNumber);
+				const pr: ProjectReference = new ProjectReference(refType, name, isDeclaration, txtDoc.uri, lineNumber, this.projectFolder);
 				this.refs.push(pr);
-				console.log(pr);
+				console.log(`${pr}`);
 			}
 
 			lineNumber++;
@@ -132,15 +140,11 @@ export class ReferenceManager {
 			if ((attIndex > 0) && (attIndex < tokens.length - 1)) {
 			
 				resp = tokens[attIndex + 1];
-				console.log(resp);
 			}
 		}
 
-		console.log(tokens);
-		
 		return resp;
 	}
-	
 
 	public getReferences(text: string): Location[] {
 		const defLocs = this.refs.filter(r => r.name.toUpperCase() == text.trim().toUpperCase())

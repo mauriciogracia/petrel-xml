@@ -1,0 +1,101 @@
+<root>
+
+	
+	<action name="function" function="funABC">
+		<stick>
+			<refer>
+				<tea>lay</tea>
+				<remain>-1182094573</remain>
+				<cat>-2074570103</cat>
+				<condition>-67138653.53237033</condition>
+				<dot>steep</dot>
+				<count>822925572.6126881</count>
+			</refer>
+			<disease>513315683</disease>
+			<seen>-508510352.93165374</seen>
+			<parallel>lay</parallel>
+			<seven>561369203</seven>
+			<like>nose</like>
+		</stick>
+		<sick>wear</sick>
+		<horn>-1345025299.2719142</horn>
+		<duty>-501750253.1565833</duty>
+		<remove>1760109877.683562</remove>
+		<mark>student</mark>
+	</action>
+	<action name="rule" rulename="updatedRule">
+	</action>
+	<action name="rule" rulename="ruleAnother">
+		<reason>1024690158</reason>
+		<silent>
+			<society>
+				<wave>direction</wave>
+				<practical>smell</practical>
+				<sky>1460903388.2870882</sky>
+				<produce>start</produce>
+				<noise>-70375055.77636766</noise>
+				<needed>everybody</needed>
+			</society>
+			<week>you</week>
+			<giving>1440171411.0970647</giving>
+			<army>valley</army>
+			<desk>-1769317207</desk>
+			<laugh>1751771616.5418353</laugh>
+		</silent>
+		<stand>trace</stand>
+		<fur>1677825706.8717031</fur>
+		<thick>luck</thick>
+		<president>biggest</president>
+	</action>
+	<action name="rule" rulename="testing123">
+		<reason>1024690158</reason>
+		<silent>
+			<society>
+				<wave>direction</wave>
+				<practical>smell</practical>
+				<sky>1460903388.2870882</sky>
+				<produce>start</produce>
+				<noise>-70375055.77636766</noise>
+				<needed>everybody</needed>
+			</society>
+			<week>you</week>
+			<giving>1440171411.0970647</giving>
+			<army>valley</army>
+			<desk>-1769317207</desk>
+			<laugh>1751771616.5418353</laugh>
+		</silent>
+		<stand>trace</stand>
+		<fur>1677825706.8717031</fur>
+		<thick>luck</thick>
+		<president>biggest</president>
+	</action>
+	<action name="rule" rulename="ruleABC">
+		<reason>1024690158</reason>
+		<silent>
+			<society>
+				<wave>direction</wave>
+				<practical>smell</practical>
+				<sky>1460903388.2870882</sky>
+				<produce>start</produce>
+				<noise>-70375055.77636766</noise>
+				<needed>everybody</needed>
+			</society>
+			<week>you</week>
+			<giving>1440171411.0970647</giving>
+			<army>valley</army>
+			<desk>-1769317207</desk>
+			<laugh>1751771616.5418353</laugh>
+		</silent>
+		<stand>trace</stand>
+		<fur>1677825706.8717031</fur>
+		<thick>luck</thick>
+		<president>biggest</president>
+	</action>
+	<action name="rule" rulename="updatedRule">
+	</action>
+</root>
+<!--
+typescript lets you write JavaScript the way you really want to.
+typescript is a typed superset of JavaScript that compiles to plain JavaScript.
+Any browser. Any host. Any OS. Open Source.
+-->

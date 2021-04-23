@@ -1,0 +1,57 @@
+<root>
+	<rule name="testing123">
+		<example />
+	</rule>
+	<rule name="updatedRule">
+		<example />
+	</rule>
+	<rule name="ruleAnother">
+		<badly>nearest</badly>
+		<court>deer</court>
+		<well>society</well>
+		<remove>
+			<southern>television</southern>
+			<transportation>-760662567</transportation>
+			<middle>1130175863.6269107</middle>
+			<negative>914291977</negative>
+			<fox>
+				<having>bite</having>
+				<upper>start</upper>
+				<matter>672868044.8533859</matter>
+				<field>plus</field>
+				<labor>closer</labor>
+				<new>bee</new>
+			</fox>
+			<both>1822181259.824795</both>
+		</remove>
+		<pitch>-1677324660.7558398</pitch>
+		<angle>unknown</angle>
+	</rule>
+	<rule name="ruleABC">
+		<badly>nearest</badly>
+		<court>deer</court>
+		<well>society</well>
+		<remove>
+			<southern>television</southern>
+			<transportation>-760662567</transportation>
+			<middle>1130175863.6269107</middle>
+			<negative>914291977</negative>
+			<fox>
+				<having>bite</having>
+				<upper>start</upper>
+				<matter>672868044.8533859</matter>
+				<field>plus</field>
+				<labor>closer</labor>
+				<new>bee</new>
+			</fox>
+			<both>1822181259.824795</both>
+		</remove>
+		<pitch>-1677324660.7558398</pitch>
+		<angle>unknown</angle>
+	</rule>
+</root>
+<!--
+typescript lets you write JavaScript the way you really want to.
+typescript is a typed superset of JavaScript that compiles to plain JavaScript.
+Any browser. Any host. Any OS. Open Source.
+-->

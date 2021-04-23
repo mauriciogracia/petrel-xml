@@ -23,6 +23,7 @@ import {
 import DefinitionFinder from './definition-finder';
 import { ReferenceManager } from './reference-manager';
 
+
 // Create a connection for the server, using Node's IPC as a transport.
 // Also include all preview / proposed LSP features.
 const connection = createConnection(ProposedFeatures.all);
@@ -41,6 +42,7 @@ let hasDiagnosticRelatedInformationCapability = false;
 connection.onInitialize((params: InitializeParams) => {
 	const capabilities = params.capabilities;
 
+	
 	// Does the client support the `workspace/configuration` request?
 	// If not, we fall back using global settings.
 	hasConfigurationCapability = !!(
@@ -55,6 +57,9 @@ connection.onInitialize((params: InitializeParams) => {
 		capabilities.textDocument.publishDiagnostics.relatedInformation
 	);
 
+	if (hasWorkspaceFolderCapability) {
+		refManager.updateWorkspaceReferences(params.workspaceFolders!) ;
+	}
 	const result: InitializeResult = {
 		capabilities: {
 			definitionProvider: true,
@@ -77,6 +82,8 @@ connection.onInitialize((params: InitializeParams) => {
 	
 	return result;
 });
+
+
 
 connection.onInitialized(() => {
 	if (hasConfigurationCapability) {
@@ -271,3 +278,5 @@ documents.listen(connection);
 
 // Listen on the connection
 connection.listen();
+
+
