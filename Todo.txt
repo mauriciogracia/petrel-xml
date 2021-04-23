@@ -15,16 +15,16 @@ X Provide LocationLink for definitions (CTRL + click)
 
 X suggest "All references" not just "Definitions"
 
-- update all reference when workspace is loaded/extension is inited
+X update all reference when workspace is loaded/extension is inited
 
-- definitions for
+- Also detectes definitions and usages for:
 	- set-var
 	- include blocks
 	- infosets
 	- output (they behave as variable declarations)
-	- other petrel xml tags
 
-- Publish the extension - https://code.visualstudio.com/api/working-with-extensions/publishing-extension
+- Deploy the Extesion
+	- Package and Publish the extension - https://code.visualstudio.com/api/working-with-extensions/publishing-extension
 
 -------------
 	Overview of features - https://microsoft.github.io/language-server-protocol/overviews/lsp/overview/

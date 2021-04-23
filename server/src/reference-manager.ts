@@ -6,6 +6,7 @@ import readline = require('readline');
 import { fileURLToPath, URL } from 'url';
 import { Position, TextDocument } from 'vscode-languageserver-textdocument';
 import { WorkspaceFolder } from "vscode-languageserver/node";
+import globby = require('globby');
 
 export class ReferenceManager {
 	
@@ -20,14 +21,19 @@ export class ReferenceManager {
 
 	public async updateWorkspaceReferences(workspaceFolders: WorkspaceFolder[]) {
 		this.projectFolder = workspaceFolders[0].uri;
-		console.log(this.projectFolder);
+		console.log(`Updating references for: ${this.projectFolder}`);
+
+		const paths = await globby("**/*.xml");  
+		console.log(paths);
+
+		paths.forEach(async p => await this.update(this.projectFolder + '//' + p));
 	}
 
-	public async update(txtDoc: TextDocument) {
+	public async update(docUri: string) {
 
-		const url = new URL(txtDoc.uri);
+		const url = new URL(docUri);
 
-		this.removeAllDocumentReferences(txtDoc.uri);
+		this.removeAllDocumentReferences(docUri);
 
 		const filePath = fileURLToPath(url);
 
@@ -71,7 +77,7 @@ export class ReferenceManager {
 			}
 
 			if (createReference) {
-				const pr: ProjectReference = new ProjectReference(refType, name, isDeclaration, txtDoc.uri, lineNumber, this.projectFolder);
+				const pr: ProjectReference = new ProjectReference(refType, name, isDeclaration, docUri, lineNumber, this.projectFolder);
 				this.refs.push(pr);
 				console.log(`${pr}`);
 			}

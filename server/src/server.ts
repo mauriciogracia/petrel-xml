@@ -149,9 +149,12 @@ documents.onDidClose(e => {
 // The content of a text document has changed. This event is emitted
 // when the text document first opened or when its content has changed.
 documents.onDidChangeContent(change => {
-	refManager.update(change.document);
-	//MGG usefull for document validation -
-	//validateDocument(change.document);
+	refManager.update(change.document.uri);
+	
+	/*
+	MGG usefull if document validation is going to be implemented
+	validateDocument(change.document);
+	*/
 });
 
 /**
