@@ -3,13 +3,13 @@ X get current symbol to go to definition
 X return empty location for symbols that are not found
 X remove warnings from extension example
 
-/ update references when current document is updated
+X update references when current document is updated
 	X process line by line
-	X handle different scenarios
-	X keep line number
-	/ Change the document and see if line references update 
-		/ remove all references of the updated document (verify if this is working)
-		- new added rules/functions are not being detected
+	X Change the document and see if line references update 
+		X remove all references of the updated document (verify if this is working)
+		X new added rules/functions are being detected
+
+X Autocomplente for the detected functions/rules is working (CTRL+SPACE)
 
 X Provide LocationLink for definitions (CTRL + click)
 
@@ -17,6 +17,10 @@ X suggest "All references" not just "Definitions"
 
 X update all reference when workspace is loaded/extension is inited
 
+- Fix Symbol not being detected correclty
+	- when a selection exists
+	- other scenarios
+	
 - Avoid updating references when the file is just opened (only when updated)
 
 - Also detect definitions and usages for:

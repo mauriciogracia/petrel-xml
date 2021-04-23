@@ -64,11 +64,7 @@ connection.onInitialize((params: InitializeParams) => {
 		capabilities: {
 			definitionProvider: true,
 			referencesProvider: true,
-			textDocumentSync: TextDocumentSyncKind.Incremental,
-			// Tell the client that this server supports code completion.
-			completionProvider: {
-				resolveProvider: true
-			}
+			textDocumentSync: TextDocumentSyncKind.Incremental
 		}
 	};
 	if (hasWorkspaceFolderCapability) {

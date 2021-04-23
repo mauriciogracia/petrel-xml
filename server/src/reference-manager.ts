@@ -1,12 +1,11 @@
 import { ProjectReference } from './project-reference';
 import { ReferenceType } from "./reference-type";
 import { Location, LocationLink, ReferenceParams, TextDocumentPositionParams, TextDocuments } from 'vscode-languageserver';
-import fs = require('fs');
-import readline = require('readline');
-import { fileURLToPath, URL } from 'url';
 import { Position, TextDocument } from 'vscode-languageserver-textdocument';
 import { WorkspaceFolder } from "vscode-languageserver/node";
 import globby = require('globby');
+import fs = require('fs');
+import { fileURLToPath, URL } from 'url';
 
 export class ReferenceManager {
 	
@@ -26,36 +25,33 @@ export class ReferenceManager {
 		const paths = await globby("**/*.xml");  
 		console.log(paths);
 
-		paths.forEach(async p => await this.update(this.projectFolder + '/' + p));
+		paths.forEach(p => this.update(this.projectFolder + '/' + p));
 	}
 
 	public async update(docUri: string) {
-
-		const url = new URL(docUri);
-
-		this.removeAllDocumentReferences(docUri);
-
-		const filePath = fileURLToPath(url);
-
-		const fileStream = fs.createReadStream(filePath);
-
-		const rl = readline.createInterface({
-			input: fileStream,
-			crlfDelay: Infinity
-		});
-		
-		// Note: we use the crlfDelay option to recognize all instances of CR LF
-		// ('\r\n') in input.txt as a single line break.
-	
+		let allText: string;
 		let name:string;
-		let lineNumber = 1;
 		let isDeclaration: boolean;
 		let createReference: boolean;
 		let refType: ReferenceType;
-		
-		console.log(`projectFolder: ${this.projectFolder}`);
-		
-		rl.on('line', (line) => {
+
+		this.removeAllDocumentReferences(docUri);
+
+		//If the document is not open (in the documents cache) read it from disk
+		if (this.documents.get(docUri) == null)
+		{
+			const url = new URL(docUri);
+			const filePath = fileURLToPath(url);
+			allText = fs.readFileSync(filePath,"utf8");
+		}
+		else {
+			allText = this.documents.get(docUri)!.getText();
+		}
+		const lines = allText.split(/\r?\n/g);
+	
+		console.log(`updating: ${docUri}`);
+
+		lines?.forEach((line,i) => {
 			if (line.includes("<function ") || line.includes("<rule ")) {
 				//Determine if it's a rule/function definition 
 				refType = line.includes("<rule ") ? ReferenceType.Rule : ReferenceType.Function;
@@ -77,12 +73,10 @@ export class ReferenceManager {
 			}
 
 			if (createReference) {
-				const pr: ProjectReference = new ProjectReference(refType, name, isDeclaration, docUri, lineNumber, this.projectFolder);
+				const pr: ProjectReference = new ProjectReference(refType, name, isDeclaration, docUri, i+1, this.projectFolder);
 				this.refs.push(pr);
 				console.log(`${pr}`);
 			}
-
-			lineNumber++;
 		});
 	}
 
@@ -94,13 +88,8 @@ export class ReferenceManager {
 
 	public removeAllDocumentReferences(docUri: string) {
 		if (this.refs.some(pr => pr.fileUri === docUri)) {
-
-			this.showAllReferences(`BeforeRemoving`);
-
 			//keep references for all documents that are not the especified by docUri 
 			this.refs = this.refs.filter(pr => pr.fileUri !== docUri);
-		
-			this.showAllReferences(`AfterRemoving: ${docUri}`);
 		}
 	}
 
