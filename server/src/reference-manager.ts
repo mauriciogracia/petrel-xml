@@ -26,7 +26,7 @@ export class ReferenceManager {
 		const paths = await globby("**/*.xml");  
 		console.log(paths);
 
-		paths.forEach(async p => await this.update(this.projectFolder + '//' + p));
+		paths.forEach(async p => await this.update(this.projectFolder + '/' + p));
 	}
 
 	public async update(docUri: string) {
@@ -86,11 +86,24 @@ export class ReferenceManager {
 		});
 	}
 
-	public removeAllDocumentReferences(docUri: string)
-	{
-		//keep references for all documents that are not the especified by docUri 
-		this.refs = this.refs.filter(r => r.fileUri != docUri);
+	public showAllReferences(message: string) {
+		
+		console.log(`------------${message}------------`);
+		this.refs.forEach((pr) => { console.log(`${pr}`); });
 	}
+
+	public removeAllDocumentReferences(docUri: string) {
+		if (this.refs.some(pr => pr.fileUri === docUri)) {
+
+			this.showAllReferences(`BeforeRemoving`);
+
+			//keep references for all documents that are not the especified by docUri 
+			this.refs = this.refs.filter(pr => pr.fileUri !== docUri);
+		
+			this.showAllReferences(`AfterRemoving: ${docUri}`);
+		}
+	}
+
 	public getSymbolAtPosition(position: Position, documentUri: string): string {
 
 		console.log(position);

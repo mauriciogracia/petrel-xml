@@ -1,6 +1,7 @@
 <root>
-
+	<action name="function" function="anotherFunction">
 	
+	</action>
 	<action name="function" function="funABC">
 		<stick>
 			<refer>

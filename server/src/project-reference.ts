@@ -29,6 +29,7 @@ export class ProjectReference {
 	public toString = (): string => {
 		let fileUri;
 
+		
 		if (this.baseFolder.length !== 0)
 		{
 			fileUri = `$${this.fileUri.substr(this.baseFolder.length)}`;
@@ -37,6 +38,8 @@ export class ProjectReference {
 		{
 			fileUri = this.fileUri;
 		}
+		
+		//const fileUri = this.fileUri;
 
 		const resp = `ProjectReference = {type:${this.type}, name:${this.name}, isDeclaration:${this.isDeclaration}, fileUri:${fileUri}, line:${this.line}`;
 

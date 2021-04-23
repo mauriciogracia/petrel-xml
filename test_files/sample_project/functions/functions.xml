@@ -1,4 +1,10 @@
 <root>
+	<function name="updatedFunction">
+
+	</function>
+	<function name="anotherFunction">
+
+	</function>
 	<function name="funABC">
 		<root>
 			<individual>
