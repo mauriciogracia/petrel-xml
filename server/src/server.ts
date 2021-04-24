@@ -5,14 +5,8 @@
 import {
 	createConnection,
 	TextDocuments,
-	Diagnostic,
-	DiagnosticSeverity,
 	ProposedFeatures,
 	InitializeParams,
-	DidChangeConfigurationNotification,
-	CompletionItem,
-	CompletionItemKind,
-	TextDocumentPositionParams,
 	TextDocumentSyncKind,
 	InitializeResult
 } from 'vscode-languageserver/node';
@@ -20,6 +14,7 @@ import {
 import {
 	TextDocument
 } from 'vscode-languageserver-textdocument';
+
 import DefinitionFinder from './definition-finder';
 import { ReferenceManager } from './reference-manager';
 
@@ -31,9 +26,7 @@ const connection = createConnection(ProposedFeatures.all);
 // Create a simple text document manager.
 const documents: TextDocuments<TextDocument> = new TextDocuments(TextDocument);
 
-const refManager: ReferenceManager = new ReferenceManager(documents);
-
-const definitionFinder = new DefinitionFinder(connection, refManager);
+const refManager: ReferenceManager = new ReferenceManager(documents, connection);
 
 let hasWorkspaceFolderCapability = false;
 

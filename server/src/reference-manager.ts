@@ -1,22 +1,32 @@
 import { ProjectReference } from './project-reference';
 import { ReferenceType } from "./reference-type";
-import { Location, LocationLink, ReferenceParams, TextDocumentPositionParams, TextDocuments } from 'vscode-languageserver';
+import { Location, LocationLink, ReferenceParams, TextDocumentPositionParams, TextDocuments, _, _Connection } from 'vscode-languageserver';
 import { Position, TextDocument } from 'vscode-languageserver-textdocument';
 import { WorkspaceFolder } from "vscode-languageserver/node";
 import globby = require('globby');
 import fs = require('fs');
 import { fileURLToPath, URL } from 'url';
+import DefinitionFinder from './definition-finder';
 
 export class ReferenceManager {
+	definitionFinder: DefinitionFinder;
 	
+	//Keeps referces of definitions and usage/call between XML files
 	refs: ProjectReference[] = [];
+
+	//the current workspace folder
 	projectFolder = '';
+	
 	//reg expresion that matches the XML elements relevant to this extension
-	public TokenSeparatorsXML = /[\t= <>"]/;
+	TokenSeparatorsXML = /[\t= <>"]/;
 	
 	constructor(
-		private documents: TextDocuments<TextDocument>)
-	{ }
+		private documents: TextDocuments<TextDocument>,
+		connection: _Connection<_, _, _, _, _, _, _>
+	)
+	{
+		this.definitionFinder = new DefinitionFinder(connection, this);
+	}
 
 	public async updateWorkspaceReferences(workspaceFolders: WorkspaceFolder[]) {
 		this.projectFolder = workspaceFolders[0].uri;
