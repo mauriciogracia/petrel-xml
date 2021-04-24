@@ -17,6 +17,8 @@ X suggest "All references" not just "Definitions"
 
 X update all reference when workspace is loaded/extension is inited
 
+X remove example code that is no longer needed 
+
 - Fix Symbol not being detected correclty
 	- when a selection exists
 	- other scenarios
