@@ -35,10 +35,10 @@ export class ReferenceManager {
 		const paths = await globby("**/*.xml");  
 		console.log(paths);
 
-		paths.forEach(p => this.update(this.projectFolder + '/' + p));
+		paths.forEach(p => this.updateDocumentReferences(this.projectFolder + '/' + p));
 	}
 
-	public async update(docUri: string) {
+	public async updateDocumentReferences(docUri: string) {
 		let allText: string;
 		let name:string;
 		let isDeclaration: boolean;
@@ -104,33 +104,38 @@ export class ReferenceManager {
 	}
 
 	public getSymbolAtPosition(position: Position, documentUri: string): string {
-
-		console.log(position);
-
 		const range = {
 			start: { line: position.line, character: 0},
 			end: { line: position.line, character: Number.MAX_VALUE  }
 		};
 		//get the whole line 
-		const line = this.documents.get(documentUri)?.getText(range) || '';
+		const txtDoc = this.documents.get(documentUri)!;
+		const allText = txtDoc.getText();
 
-		let start = position.character;
-		while ((start > 0) && !line[start].match(this.TokenSeparatorsXML))
+		//convert the position of the selection or cursor to a index in the document text 
+		const offset = txtDoc.offsetAt(position);
+
+		let start = offset-1;
+
+		/* for debuggin		
+		const line = allText.substr(start, 50);
+		console.log({ line: line });
+		*/
+		while ((start > 0) && !allText[start].match(this.TokenSeparatorsXML))
 		{
 			start--;
 		}
+		
+		let end = offset;
 
-		let end = position.character;
-		while ((end < line.length) && !line[end].match(this.TokenSeparatorsXML))
+		while ((end < allText.length) && !allText[end].match(this.TokenSeparatorsXML))
 		{
 			end++;
 		}
 
-		const symbol = line.substr(start+1, end-start-1);
+		const symbol = allText.substr(start + 1, end - start - 1);
 
-		console.log(`line: ${line}`) ;
-		console.log(`${start}->${end}`);
-		console.log(`symbol: ${symbol}`);
+		console.log(`${start}->${end}- symbol: ${symbol}`);
 
 		return symbol;
 	}

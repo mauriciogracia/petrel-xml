@@ -19,12 +19,10 @@ X update all reference when workspace is loaded/extension is inited
 
 X remove example code that is no longer needed 
 
-- Fix Symbol not being detected correclty
-	- when a selection exists
-	- other scenarios
-	
-- Avoid updating references when the file is just opened (only when updated)
+X Trying to "go to Definition" over a definition is showings references instead (this is vscode standard behaviour)
 
+X Fix Symbol not being detected correclty when a selection exists
+	
 - Also detect definitions and usages for:
 	- set-var
 	- include blocks
@@ -34,7 +32,8 @@ X remove example code that is no longer needed
 - Deploy the Extesion
 	- Package and Publish the extension - https://code.visualstudio.com/api/working-with-extensions/publishing-extension
 
--------------
+------------- Some of the links used during development -------------
+
 	Overview of features - https://microsoft.github.io/language-server-protocol/overviews/lsp/overview/
 
 	Example - https://vscode-docs.readthedocs.io/en/stable/extensions/example-language-server/
