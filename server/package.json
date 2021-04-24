@@ -1,8 +1,9 @@
 {
 	"name": "petrel-xml",
-	"description": "Example implementation of a language server in node.",
-	"version": "1.0.0",
+	"description": "Extension for codenavigation and autocomplete for Petrel XML files",
+	"version": "0.9.1",
 	"author": "Mauricio Gracia Gutierrez",
+	"publisher": "Mauricio Gracia Gutiérrez - mgg.isco@gmail.com",
 	"license": "GNU/GPL",
 	"engines": {
 		"node": "*"

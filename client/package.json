@@ -1,14 +1,10 @@
 {
 	"name": "petrel-xml",
-	"description": "Extension for Petrel XML files",
-	"author": "Mauricio Gracia Gutiérrez - mgg.isco@gmail.com",
+	"description": "Extension for codenavigation and autocomplete for Petrel XML files",
+	"version": "0.9.1",
+	"author": "Mauricio Gracia Gutiérrez",
+	"publisher": "Mauricio Gracia Gutiérrez - mgg.isco@gmail.com",
 	"license": "GNU/GPL",
-	"version": "0.0.1",
-	"publisher": "vscode",
-	"repository": {
-		"type": "git",
-		"url": "https://github.com/Microsoft/vscode-extension-samples"
-	},
 	"engines": {
 		"vscode": "^1.52.0"
 	},
