@@ -9,7 +9,7 @@ This is a VScode extension that aims to help development for the Petrel platform
 - Provide autocomplete based on existing functions and rules
 
 ## Installing 
-- download the *petrel-xml-0.9.1.vsix* file
+- download the *https://github.com/mauriciogracia/petrel-xml/blob/master/petrel-xml-0.9.1.vsix* file
 - run this command *code --install-extension petrel-xml-0.9.1.vsix*
 - open your Petrel folder, right click on a rule or function name 
    - go to definition
