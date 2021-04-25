@@ -13,7 +13,9 @@ This is a VScode extension that aims to help development for the Petrel platform
 - run this command *code --install-extension petrel-xml-0.9.1.vsix*
 - open your Petrel folder, right click on a rule or function name 
    - go to definition
-   - find all refences  
+   - find all references  
+
+Keep in mind that if you have a complex folder structure the first time it might take a while to start workin since is building all references
 
 # If you are interested in maintining and improving this extension continue reading
 
