@@ -16,5 +16,13 @@ module.exports = {
 		'@typescript-eslint/no-explicit-any': 0,
 		'@typescript-eslint/explicit-module-boundary-types': 0,
 		'@typescript-eslint/no-non-null-assertion': 0,
+	},
+	"eslint.options": {
+		"env":{
+			"es6":true
+		},
+		"parserOptions": {
+			"ecmaVersion": 6 // or 7,8,9
+		}
 	}
 };

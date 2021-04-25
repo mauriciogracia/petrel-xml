@@ -43,13 +43,13 @@ export function activate(context: ExtensionContext) {
 			// Notify the server about file changes to '.clientrc files contained in the workspace
 			fileEvents: workspace.createFileSystemWatcher('**/.clientrc')
 		},
-		outputChannelName: 'Petrel-XML Language Server',
+		outputChannelName: 'Petrel-XML Extension',
 	};
 
 	// Create the language client and start the client.
 	client = new LanguageClient(
-		'languageServerExample',
-		'Language Server Example',
+		'petrel-xml',
+		'petrel-xml',
 		serverOptions,
 		clientOptions
 	);

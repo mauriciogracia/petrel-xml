@@ -10,9 +10,19 @@ This is a VScode extension that aims to help development for the Petrel platform
 
 ## Installing 
 - download the *petrel-xml-0.9.1.vsix* file
-- run this command *code --install-extension petrel-xml-0.9.1.vsix**
+- run this command *code --install-extension petrel-xml-0.9.1.vsix*
+- open your Petrel folder, right click on a rule or function name 
+   - go to definition
+   - find all refences  
 
-## Running and Debugging
+# If you are interested in maintining and improving this extension continue reading
+
+## To package the extesion
+- $ vsce package
+
+This uses webpack and the .vscodeignore and package.json settings
+
+## Running and Debugging from VS code
 
 - Run `npm install` in this folder. This installs all necessary npm modules in both the client and server folder
 - Open VS Code on this folder.
@@ -22,9 +32,9 @@ This is a VScode extension that aims to help development for the Petrel platform
 - Run the launch config.
 - If you want to debug the server as well use the launch configuration `Attach to Server`
 - In the [Extension Development Host] instance of VSCode, open an Petrel XML document 
-- The extension logs on the Output tab under the Petrel-XML Language Server
+- The extension logs on the `Output` tab under the `Petrel-XML Extension` channel
 
-## Structure
+## Main Code Structure
 
 ```
 .

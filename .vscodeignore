@@ -1,10 +1,11 @@
 .vscode
-client/node_modules/**
-client/out/**
+**/*.ts
+**/*.map
+out/**
+node_modules/**
+test_files/**
 client/src/**
 server/src/**
-server/out/**
-server/node_modules/**
 tsconfig.json
 webpack.config.js
 .gitignore

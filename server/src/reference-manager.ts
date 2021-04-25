@@ -55,7 +55,12 @@ export class ReferenceManager {
 		{
 			const url = new URL(docUri);
 			const filePath = fileURLToPath(url);
-			allText = fs.readFileSync(filePath,"utf8");
+			try {
+				allText = fs.readFileSync(filePath, "utf8");
+			}
+			catch {
+				allText = '';
+			}
 		}
 		else {
 			allText = this.documents.get(docUri)!.getText();
