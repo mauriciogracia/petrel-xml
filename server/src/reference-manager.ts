@@ -35,7 +35,7 @@ export class ReferenceManager {
 		this.projectFolder = workspaceFolders[0].uri;
 		console.log(`Updating references for: ${this.projectFolder}`);
 
-		const paths = await globby("**/*.xml");  
+		const paths = await globby("**/*.xml").catch(err => console.log(`globby error: ${err}`)) || [];
 		console.log(paths);
 
 		paths.forEach(p => this.updateDocumentReferences(this.projectFolder + '/' + p));

@@ -22,9 +22,11 @@ X remove example code that is no longer needed
 X Trying to "go to Definition" over a definition is showings references instead (this is vscode standard behaviour)
 
 X Fix Symbol not being detected correclty when a selection exists
-	
+
+- Remove warning from "Buffer" usage
+
 - Also detect definitions and usages for:
-	- set-var
+	- set-var/clear-var 
 	- include blocks
 	- infosets
 	- output (they behave as variable declarations)
