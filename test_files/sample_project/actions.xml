@@ -24,7 +24,13 @@
 		<remove>1760109877.683562</remove>
 		<mark>student</mark>
 	</action>
+	<action name="function" function="ListadoMecanicos">
+	
+	</action>
 	<action name="rule" rulename="updatedRule">
+	</action>
+		<action name="function" function="ListadoMecanicos">
+	
 	</action>
 	<action name="rule" rulename="ruleAnother">
 		<reason>1024690158</reason>
@@ -47,6 +53,9 @@
 		<fur>1677825706.8717031</fur>
 		<thick>luck</thick>
 		<president>biggest</president>
+	</action>
+		<action name="function" function="ListadoMecanicos">
+	
 	</action>
 	<action name="rule" rulename="testing123">
 		<reason>1024690158</reason>

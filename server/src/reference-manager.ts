@@ -17,8 +17,7 @@ export class ReferenceManager {
 	//the current workspace folder
 	projectFolder = '';
 	
-	//reg expresion that matches the XML elements relevant to this extension
-	TokenSeparatorsXML = /[\t= <>"]/;
+
 	
 	constructor(
 		private documents: TextDocuments<TextDocument>,
@@ -26,6 +25,10 @@ export class ReferenceManager {
 	)
 	{
 		this.definitionFinder = new DefinitionFinder(connection, this);
+	}
+
+	public getDocument(documentUri: string) : TextDocument {
+		return this.documents.get(documentUri)!;
 	}
 
 	public async updateWorkspaceReferences(workspaceFolders: WorkspaceFolder[]) {
@@ -65,15 +68,15 @@ export class ReferenceManager {
 			if (line.includes("<function ") || line.includes("<rule ")) {
 				//Determine if it's a rule/function definition 
 				refType = line.includes("<rule ") ? ReferenceType.Rule : ReferenceType.Function;
-				name = this.getAttributeValueXML("name", line);
+				name = this.definitionFinder.getAttributeValueXML("name", line);
 				createReference = (name !== '');
 				isDeclaration = true;
 			}
 			else if (line.includes("<action ")) {
 				refType = ReferenceType.Call;
-				name = this.getAttributeValueXML("rulename", line);
+				name = this.definitionFinder.getAttributeValueXML("rulename", line);
 				if (name.length == 0) { 
-					name = this.getAttributeValueXML("function", line);
+					name = this.definitionFinder.getAttributeValueXML("function", line);
 				}
 				createReference = (name !== '');
 				isDeclaration = false;
@@ -103,71 +106,9 @@ export class ReferenceManager {
 		}
 	}
 
-	public getSymbolAtPosition(position: Position, documentUri: string): string {
-		const range = {
-			start: { line: position.line, character: 0},
-			end: { line: position.line, character: Number.MAX_VALUE  }
-		};
-		//get the whole line 
-		const txtDoc = this.documents.get(documentUri)!;
-		const allText = txtDoc.getText();
+	
 
-		//convert the position of the selection or cursor to a index in the document text 
-		const offset = txtDoc.offsetAt(position);
-
-		let start = offset-1;
-
-		/* for debuggin		
-		const line = allText.substr(start, 50);
-		console.log({ line: line });
-		*/
-		while ((start > 0) && !allText[start].match(this.TokenSeparatorsXML))
-		{
-			start--;
-		}
-		
-		let end = offset;
-
-		while ((end < allText.length) && !allText[end].match(this.TokenSeparatorsXML))
-		{
-			end++;
-		}
-
-		const symbol = allText.substr(start + 1, end - start - 1);
-
-		console.log(`${start}->${end}- symbol: ${symbol}`);
-
-		return symbol;
-	}
-
-	public getAttributeValueXML(attributeName: string, line: string): string {
-		let resp = '';
-
-		//extract the tokens from a single XML line
-		const tokens: string[] = line.split(this.TokenSeparatorsXML).filter(x => x);
-		
-		//look up the attribute by name and get the next token
-		let attIndex = tokens.indexOf(attributeName);
-		
-		if ((attIndex > 0) && (attIndex < tokens.length-1))
-		{
-			/* To handle this case : 
-			<action name="function" function="funABC" >
-
-			We need the function name...and not the value ("function") 
-			*/
-			if (tokens[attIndex - 1].toLowerCase() === "name") {
-				attIndex = tokens.indexOf(attributeName,attIndex+1);
-			}
-
-			if ((attIndex > 0) && (attIndex < tokens.length - 1)) {
-			
-				resp = tokens[attIndex + 1];
-			}
-		}
-
-		return resp;
-	}
+	
 
 	public getReferences(text: string): Location[] {
 		const defLocs = this.refs.filter(r => r.name.toUpperCase() == text.trim().toUpperCase())
