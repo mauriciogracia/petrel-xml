@@ -2,7 +2,7 @@
 	"name": "petrel-xml",
 	"displyname": "Petrel XML",
 	"description": "Extension for codenavigation and autocomplete for Petrel XML files",
-	"version": "0.9.1",
+	"version": "0.9.2",
 	"author": "Mauricio Gracia Gutiérrez",
 	"publisher": "MauricioGraciaGutierrez",
 	"license": "GPL-3.0",
