@@ -27,7 +27,7 @@ To package the extesion
 $ vsce package
 
 To publish the extension - https://code.visualstudio.com/api/working-with-extensions/publishing-extension
-$ vsce publish
+$ vsce publish <versionNumber>
 
 This uses webpack and the .vscodeignore and package.json settings
 
