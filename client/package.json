@@ -3,7 +3,7 @@
 	"description": "Extension for codenavigation and autocomplete for Petrel XML files",
 	"version": "0.9.1",
 	"author": "Mauricio Gracia Gutiérrez",
-	"publisher": "MGG",
+	"publisher": "MauricioGraciaGutierrez",
 	"license": "GPL-3.0",
 	"engines": {
 		"vscode": "^1.52.0"

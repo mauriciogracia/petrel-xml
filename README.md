@@ -9,16 +9,20 @@ This is a VScode extension that aims to help development for the Petrel platform
 - Provide autocomplete based on existing functions and rules
 
 ## Installing 
-- download the *petrel-xml-0.9.1.vsix* file
-- run this command *code --install-extension petrel-xml-0.9.1.vsix*
-- open your Petrel folder, right click on a rule or function name 
+Two options
+- Install it from https://marketplace.visualstudio.com/items?itemName=MauricioGraciaGutierrez.petrel-xml
+- From VScode search for an extesion called `petrel-xml`
+
+Once is installed open your Petrel folder, right click on a rule or function name 
    - go to definition
-   - find all refences  
+   - find all references  
 
 # If you are interested in maintining and improving this extension continue reading
 
-## To package the extesion
+To package the extesion
 - $ vsce package
+To publish the extension
+- $ vsce publish
 
 This uses webpack and the .vscodeignore and package.json settings
 

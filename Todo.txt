@@ -31,8 +31,8 @@ X Fix Symbol not being detected correclty when a selection exists
 	- infosets
 	- output (they behave as variable declarations)
 
-- Deploy the Extension
-	- Package and Publish the extension - https://code.visualstudio.com/api/working-with-extensions/publishing-extension
+X Deploy the Extension
+	X Package and Publish the extension - https://code.visualstudio.com/api/working-with-extensions/publishing-extension
 
 ------------- Some of the links used during development -------------
 
