@@ -1,6 +1,10 @@
 # Petrel XML
 
-This is a VScode extension that aims to help development for the Petrel platform using XML files
+This is a VScode extension that aims to help development for the Petrel platform using XML files.
+
+When you open the Petrel folder the extension builds the references between all the XML files
+you can see this in on the `Output` tab under the `Petrel-XML Extension` channel, when that process
+is finised a message `>>> petrel-xml extension is ready <<<`  will be shown
 
 ## Functionality
 
@@ -20,9 +24,10 @@ Once is installed open your Petrel folder, right click on a rule or function nam
 # If you are interested in maintining and improving this extension continue reading
 
 To package the extesion
-- $ vsce package
-To publish the extension
-- $ vsce publish
+$ vsce package
+
+To publish the extension - https://code.visualstudio.com/api/working-with-extensions/publishing-extension
+$ vsce publish
 
 This uses webpack and the .vscodeignore and package.json settings
 

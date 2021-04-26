@@ -38,7 +38,8 @@ export class ReferenceManager {
 		const paths = await globby("**/*.xml").catch(err => console.log(`globby error: ${err}`)) || [];
 		console.log(paths);
 
-		paths.forEach(p => this.updateDocumentReferences(this.projectFolder + '/' + p));
+		paths.forEach(async p => await this.updateDocumentReferences(this.projectFolder + '/' + p));
+		console.log(`>>> petrel-xml extension is ready <<<`);
 	}
 
 	public async updateDocumentReferences(docUri: string) {
