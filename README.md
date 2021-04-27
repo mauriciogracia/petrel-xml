@@ -11,6 +11,7 @@ is finised a message `>>> petrel-xml extension is ready <<<`  will be shown
 - Navigate to functions and rules definitions from where they are being used
 - Show all references where a rule or function is being used
 - Provide autocomplete based on existing functions and rules
+- When XML files are added, renamed, relocated, deleted the change is detected and references are updated (including folder operations as well) - version 0.9.4 
 
 ## Installing 
 Two options

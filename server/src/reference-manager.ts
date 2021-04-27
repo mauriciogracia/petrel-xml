@@ -42,11 +42,23 @@ export class ReferenceManager {
 	public async checkWorkspaceChanges() {
 		const wsFilePaths = await this.getWorkspaceFilePaths();
 
-		console.log({ referencedDocs: this.referencedDocs });
-		console.log({ wsFilePaths: wsFilePaths });
 		//Determine if the referenced docs does not match the xml files in the workspace 
 		const obsoleteRefs = this.referencedDocs.filter(rd => wsFilePaths.indexOf(rd) == -1);
-		console.log({ obsoleteRefs: obsoleteRefs });
+
+		if (obsoleteRefs.length > 0) {
+			console.log({ obsoleteRefs: obsoleteRefs });
+			obsoleteRefs.forEach(r => this.removeDocumentReferences(r));
+		}
+
+		//Determine if new files have not been referenced
+		const filesNotReferenced = wsFilePaths.filter(fp => this.referencedDocs.indexOf(fp) == -1);
+
+		if (filesNotReferenced.length > 0) {
+			console.log({ filesNotReferenced: filesNotReferenced });
+			filesNotReferenced.forEach(r => this.updateDocumentReferences(r));
+		}
+
+		
 	}
 
 	public toFullPath(relPath: string): string 
@@ -57,11 +69,7 @@ export class ReferenceManager {
 	public async updateWorkspaceReferences(workspaceFolders: WorkspaceFolder[]) {
 		this.projectFolder = workspaceFolders[0].uri;
 		console.log(`Updating references for: ${this.projectFolder}`);
-
-		const wsFilePaths = await this.getWorkspaceFilePaths();
-		console.log(wsFilePaths);
-
-		wsFilePaths.forEach(async p => await this.updateDocumentReferences(p));
+		await this.checkWorkspaceChanges();
 		console.log(`>>> petrel-xml extension is ready <<<`);
 	}
 
@@ -94,9 +102,9 @@ export class ReferenceManager {
 		let createReference: boolean;
 		let refType: ReferenceType;
 
-		this.removeAllDocumentReferences(docUri);
+		this.removeDocumentReferences(docUri);
 
-		await this.checkWorkspaceChanges();
+		//await this.checkWorkspaceChanges();
 
 		allText = this.getAllDocumentText(docUri);
 
@@ -137,29 +145,32 @@ export class ReferenceManager {
 		}
 	}
 
-	public showAllReferences(message: string) {
-		
-		console.log(`------------${message}------------`);
-		this.refs.forEach((pr) => { console.log(`${pr}`); });
-	}
+	public removeDocumentReferences(docUri: string) {
+		let removedRefs;
 
-	public removeAllDocumentReferences(docUri: string) {
+		removedRefs = 0;
+
 		if (this.refs.some(pr => pr.fileUri === docUri)) {
-			//keep references for all documents that are not the especified by docUri 
+
+			removedRefs = this.refs.length;
+			//remove all references to the especified docUri 
 			this.refs = this.refs.filter(pr => pr.fileUri !== docUri);
 
 			const index = this.referencedDocs.indexOf(docUri);
 			if (index > -1) {
 				this.referencedDocs.splice(index, 1);
 			}
+			removedRefs = removedRefs - this.refs.length;
+
+			console.log(`removedDocumentReferences: ${removedRefs} from file ${docUri}`);
 		}
+
+		
 	}
 
-	
+	public async getReferences(text: string): Promise<Location[]> {
+		await this.checkWorkspaceChanges();
 
-	
-
-	public getReferences(text: string): Location[] {
 		const defLocs = this.refs.filter(r => r.name.toUpperCase() == text.trim().toUpperCase())
 			.map((pr) =>
 			{
@@ -170,20 +181,10 @@ export class ReferenceManager {
 		return defLocs;
 	}
 
-	public getDefinitionLocations(text: string): Location[]
+	public async getDefinitionLink(text: string): Promise<LocationLink[]>
 	{
-		const defLocs = this.refs.filter(r => (r.isDeclaration == true) && r.name.toUpperCase() == text.trim().toUpperCase())
-			.map((pr) =>
-			{
-				return this.ReferenceToLocation(pr);
-			}
-		);
+		await this.checkWorkspaceChanges();
 
-		return defLocs;
-	}
-
-	public getDefinitionLink(text: string): LocationLink[]
-	{
 		const defLocs = this.refs.filter(r => (r.isDeclaration == true) && r.name.toUpperCase() == text.trim().toUpperCase())
 			.map((pr) =>
 			{

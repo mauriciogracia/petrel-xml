@@ -30,19 +30,6 @@ export default class DefinitionFinder extends Handler {
 		});
 	}
 	
-	/**
-	 * Return the location or locations where the symbol referenced at the given
-	 * location is defined.
-	 *
-	 * Implements:
-	 * https://github.com/Microsoft/language-server-protocol/blob/master/protocol.md#textDocument_definition
-	 */
-	private async getDefinition(textPosition: TextDocumentPositionParams): Promise<Location[]> {
-		const symbol = this.getSymbolAtPosition(textPosition.position, textPosition.textDocument.uri);
-
-		return this.refManager.getDefinitionLocations(symbol);
-	}
-	
 	private async getDefinitionLink(textPosition: TextDocumentPositionParams): Promise<LocationLink[]> {
 		const symbol = this.getSymbolAtPosition(textPosition.position, textPosition.textDocument.uri);
 
@@ -55,16 +42,20 @@ export default class DefinitionFinder extends Handler {
 		return this.refManager.getReferences(symbol);
 	}
 
+	public getTextInRange(documentUri: string, range: Range):string {
+		const txtDoc = this.refManager.getDocument(documentUri)!;
+		return txtDoc.getText(range);
+	}
+
 	public getSymbolAtPosition(position: Position, documentUri: string): string {
 		const range = {
 			start: { line: position.line, character: 0},
 			end: { line: position.line, character: Number.MAX_VALUE  }
 		};
-		//get the whole line 
-		const txtDoc = this.refManager.getDocument(documentUri)!;
 
-		const context = txtDoc.getText(range);
-		const offset = position.character ;
+		const context = this.getTextInRange(documentUri, range);
+
+		const offset = position.character;
 
 		let start = offset-1;
 

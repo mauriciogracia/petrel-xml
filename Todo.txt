@@ -23,18 +23,19 @@ X Trying to "go to Definition" over a definition is showings references instead 
 
 X Fix Symbol not being detected correclty when a selection exists
 
-- Detect file or folder structure changes and update references:
-	- file is:
-		- renamed (currently detects the change but keeps old file references)
-		- added to existing hierarchy
-		- relocated workspace hierarchy
-		- removed from workspace
-	- folder is:
-		- renamed
-		- added with new XML inside
-		- relocated in workspace hierarchy
-		- removed from workspace
-	- all above operations need to be tested with shurtcuts (crl+c, ctrl+v, drag and drop, etc)
+X Detect file or folder structure changes and update references:
+	X file is:
+		X renamed (currently detects the change but keeps old file references)
+		X added to existing hierarchy
+		X relocated in workspace hierarchy
+		X removed from workspace
+	X folder is:
+		X renamed
+		X added with new XML inside
+		X relocated in workspace hierarchy
+		X removed from workspace
+	
+	X all above operations need to be tested with shurtcuts (crl+c, ctrl+v, drag and drop, etc)
 
 - Remove warning from "Buffer" usage
 
