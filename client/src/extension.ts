@@ -40,8 +40,8 @@ export function activate(context: ExtensionContext) {
 		// Register the server for plain XML documents
 		documentSelector: [{ scheme: 'file', language: 'xml' }],
 		synchronize: {
-			// Notify the server about file changes to '.clientrc files contained in the workspace
-			fileEvents: workspace.createFileSystemWatcher('**/.clientrc')
+			// monitor changes to all xml files (but it does not seem to be working)
+			fileEvents: workspace.createFileSystemWatcher('**/*.xml')
 		},
 		outputChannelName: 'Petrel-XML Extension',
 	};

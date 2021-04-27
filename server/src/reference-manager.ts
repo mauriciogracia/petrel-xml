@@ -14,6 +14,9 @@ export class ReferenceManager {
 	//Keeps referces of definitions and usage/call between XML files
 	refs: ProjectReference[] = [];
 
+	//List of files that have been referenced (used to detect folder/file changes: creation, rename, move)
+	referencedDocs: string[] = [];
+	
 	//the current workspace folder
 	projectFolder = '';
 	
@@ -31,25 +34,39 @@ export class ReferenceManager {
 		return this.documents.get(documentUri)!;
 	}
 
+	public async getWorkspaceFilePaths(): Promise<string[]> {
+		//get all the XML files of the workspace and convert them to full path
+		return (await globby("**/*.xml").catch(err => console.log(`globby error: ${err}`)) || []).map(x => this.toFullPath(x));
+	}
+
+	public async checkWorkspaceChanges() {
+		const wsFilePaths = await this.getWorkspaceFilePaths();
+
+		console.log({ referencedDocs: this.referencedDocs });
+		console.log({ wsFilePaths: wsFilePaths });
+		//Determine if the referenced docs does not match the xml files in the workspace 
+		const obsoleteRefs = this.referencedDocs.filter(rd => wsFilePaths.indexOf(rd) == -1);
+		console.log({ obsoleteRefs: obsoleteRefs });
+	}
+
+	public toFullPath(relPath: string): string 
+	{
+		return (this.projectFolder + '/' + relPath);
+	}
+
 	public async updateWorkspaceReferences(workspaceFolders: WorkspaceFolder[]) {
 		this.projectFolder = workspaceFolders[0].uri;
 		console.log(`Updating references for: ${this.projectFolder}`);
 
-		const paths = await globby("**/*.xml").catch(err => console.log(`globby error: ${err}`)) || [];
-		console.log(paths);
+		const wsFilePaths = await this.getWorkspaceFilePaths();
+		console.log(wsFilePaths);
 
-		paths.forEach(async p => await this.updateDocumentReferences(this.projectFolder + '/' + p));
+		wsFilePaths.forEach(async p => await this.updateDocumentReferences(p));
 		console.log(`>>> petrel-xml extension is ready <<<`);
 	}
 
-	public async updateDocumentReferences(docUri: string) {
+	public getAllDocumentText(docUri: string) {
 		let allText: string;
-		let name:string;
-		let isDeclaration: boolean;
-		let createReference: boolean;
-		let refType: ReferenceType;
-
-		this.removeAllDocumentReferences(docUri);
 
 		//If the document is not open (in the documents cache) read it from disk
 		if (this.documents.get(docUri) == null)
@@ -66,37 +83,58 @@ export class ReferenceManager {
 		else {
 			allText = this.documents.get(docUri)!.getText();
 		}
-		const lines = allText.split(/\r?\n/g);
+
+		return allText;
+	}
+
+	public async updateDocumentReferences(docUri: string) {
+		let allText: string;
+		let name:string;
+		let isDeclaration: boolean;
+		let createReference: boolean;
+		let refType: ReferenceType;
+
+		this.removeAllDocumentReferences(docUri);
+
+		await this.checkWorkspaceChanges();
+
+		allText = this.getAllDocumentText(docUri);
+
+		if (allText.length > 0) {
+			const lines = allText.split(/\r?\n/g);
 	
-		console.log(`updating: ${docUri}`);
+			this.referencedDocs.push(docUri);
 
-		lines?.forEach((line,i) => {
-			if (line.includes("<function ") || line.includes("<rule ")) {
-				//Determine if it's a rule/function definition 
-				refType = line.includes("<rule ") ? ReferenceType.Rule : ReferenceType.Function;
-				name = this.definitionFinder.getAttributeValueXML("name", line);
-				createReference = (name !== '');
-				isDeclaration = true;
-			}
-			else if (line.includes("<action ")) {
-				refType = ReferenceType.Call;
-				name = this.definitionFinder.getAttributeValueXML("rulename", line);
-				if (name.length == 0) { 
-					name = this.definitionFinder.getAttributeValueXML("function", line);
+			console.log(`updating: ${docUri}`);
+
+			lines.forEach((line, i) => {
+				if (line.includes("<function ") || line.includes("<rule ")) {
+					//Determine if it's a rule/function definition 
+					refType = line.includes("<rule ") ? ReferenceType.Rule : ReferenceType.Function;
+					name = this.definitionFinder.getAttributeValueXML("name", line);
+					createReference = (name !== '');
+					isDeclaration = true;
 				}
-				createReference = (name !== '');
-				isDeclaration = false;
-			}
-			else {
-				createReference = false;
-			}
+				else if (line.includes("<action ")) {
+					refType = ReferenceType.Call;
+					name = this.definitionFinder.getAttributeValueXML("rulename", line);
+					if (name.length == 0) {
+						name = this.definitionFinder.getAttributeValueXML("function", line);
+					}
+					createReference = (name !== '');
+					isDeclaration = false;
+				}
+				else {
+					createReference = false;
+				}
 
-			if (createReference) {
-				const pr: ProjectReference = new ProjectReference(refType, name, isDeclaration, docUri, i+1, this.projectFolder);
-				this.refs.push(pr);
-				console.log(`${pr}`);
-			}
-		});
+				if (createReference) {
+					const pr: ProjectReference = new ProjectReference(refType, name, isDeclaration, docUri, i + 1, this.projectFolder);
+					this.refs.push(pr);
+					console.log(`${pr}`);
+				}
+			});
+		}
 	}
 
 	public showAllReferences(message: string) {
@@ -109,6 +147,11 @@ export class ReferenceManager {
 		if (this.refs.some(pr => pr.fileUri === docUri)) {
 			//keep references for all documents that are not the especified by docUri 
 			this.refs = this.refs.filter(pr => pr.fileUri !== docUri);
+
+			const index = this.referencedDocs.indexOf(docUri);
+			if (index > -1) {
+				this.referencedDocs.splice(index, 1);
+			}
 		}
 	}
 

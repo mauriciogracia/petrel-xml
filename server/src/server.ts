@@ -15,7 +15,6 @@ import {
 	TextDocument
 } from 'vscode-languageserver-textdocument';
 
-import DefinitionFinder from './definition-finder';
 import { ReferenceManager } from './reference-manager';
 
 
@@ -75,7 +74,7 @@ documents.onDidChangeContent(change => {
 
 connection.onDidChangeWatchedFiles(_change => {
 	// Monitored files have change in VSCode
-	console.log('We received an file change event');
+	console.log(`We received an file change event: ${_change}`);
 });
 
 // Make the text document manager listen on the connection
