@@ -16,7 +16,7 @@ is finised a message `>>> petrel-xml extension is ready <<<`  will be shown
 ## Installing 
 Two options
 - Install it from https://marketplace.visualstudio.com/items?itemName=MauricioGraciaGutierrez.petrel-xml
-- From VScode search for an extesion called `petrel-xml`
+- From VScode Extension (CTRL+SHIFT+X) search for `petrel-xml`
 
 Once is installed open your Petrel folder, right click on a rule or function name 
    - go to definition
