@@ -4,5 +4,6 @@ export enum ReferenceType {
 	Rule = "Rule",
 	IncludeBlock = "IncludeBlock",
 	Group = "Group",
+	Button = "Button",
 	Reference = "Reference"
 }

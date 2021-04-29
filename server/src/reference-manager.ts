@@ -1,7 +1,7 @@
 import { ProjectReference } from './project-reference';
 import { ReferenceType } from "./reference-type";
-import { Location, LocationLink, ReferenceParams, TextDocumentPositionParams, TextDocuments, _, _Connection } from 'vscode-languageserver';
-import { Position, TextDocument } from 'vscode-languageserver-textdocument';
+import { Location, LocationLink, TextDocuments, _, _Connection } from 'vscode-languageserver';
+import { TextDocument } from 'vscode-languageserver-textdocument';
 import { WorkspaceFolder } from "vscode-languageserver/node";
 import globby = require('globby');
 import fs = require('fs');
@@ -20,7 +20,6 @@ export class ReferenceManager {
 	//the current workspace folder
 	projectFolder = '';
 	
-
 	
 	constructor(
 		private documents: TextDocuments<TextDocument>,
@@ -46,7 +45,7 @@ export class ReferenceManager {
 		const obsoleteRefs = this.referencedDocs.filter(rd => wsFilePaths.indexOf(rd) == -1);
 
 		if (obsoleteRefs.length > 0) {
-			console.log({ obsoleteRefs: obsoleteRefs });
+			////DEBUG console.log({ obsoleteRefs: obsoleteRefs });
 			obsoleteRefs.forEach(r => this.removeDocumentReferences(r));
 		}
 
@@ -54,7 +53,7 @@ export class ReferenceManager {
 		const filesNotReferenced = wsFilePaths.filter(fp => this.referencedDocs.indexOf(fp) == -1);
 
 		if (filesNotReferenced.length > 0) {
-			console.log({ filesNotReferenced: filesNotReferenced });
+			////DEBUG console.log({ filesNotReferenced: filesNotReferenced });
 			filesNotReferenced.forEach(r => this.updateDocumentReferences(r));
 		}
 
@@ -98,6 +97,8 @@ export class ReferenceManager {
 	public async updateDocumentReferences(docUri: string) {
 		let allText: string;
 		let pr: ProjectReference | null ;
+		let isCommentSection : boolean;
+		let singleLineComment : boolean;
 
 		this.removeDocumentReferences(docUri);
 
@@ -110,27 +111,47 @@ export class ReferenceManager {
 	
 			this.referencedDocs.push(docUri);
 
-			console.log(`updating: ${docUri}`);
-
+			isCommentSection = false ;
+			
 			lines.forEach((line, i) => {
 				pr = null ;
+				singleLineComment = false ;
 
-				if (this.isDeclarationWithName(line)) {
-					pr = this.referenceToDeclarationWithName(line,docUri,i+1) ;
+				if(line.includes("<!--") && line.includes("-->"))
+				{
+					singleLineComment = true ; 
 				}
-				else if (line.includes("<include-block ") || line.includes("<include ")) {
-					pr = this.referenceIncludeBlock(line,docUri, i+1) ;
-				}
-				else if (line.includes("<action ")) {
-					pr = this.referenceFromAction(line,docUri, i+1) ;
+				else if (line.includes("<!--"))
+				{
+					isCommentSection = true ;
 				}
 
-				if (pr != null) {
-					this.addProjectReference(pr);
+				//ignore comments or the parser will complain since we are procesing line by line and block comments will seem open to the parse
+
+				if(	!isCommentSection && !singleLineComment)
+				{
+					if (this.isDeclarationWithName(line)) {
+						pr = this.referenceToDeclarationWithName(line,docUri,i+1) ;
+					}
+					else if (line.includes("<include-block ") || line.includes("<include ")) {
+						pr = this.referenceIncludeBlock(line,docUri, i+1) ;
+					}
+					else if (line.includes("<action ")) {
+						pr = this.referenceFromAction(line,docUri, i+1) ;
+					}
+
+					if (pr != null) {
+						this.addProjectReference(pr);
+					}
+				}
+
+				if (line.includes("-->") && !line.includes("<!--") ) {
+					isCommentSection = false ;
 				}
 			});
 		}
 	}
+
 
 	private addProjectReference(pr: ProjectReference) {
 		this.refs.push(pr);
@@ -151,21 +172,22 @@ export class ReferenceManager {
 		Usage 
 		<include include-once="yes" block="OEHRMasterTypes"/>
 		*/
+		const jsonXml = this.definitionFinder.parseXML(line) ;
 
 		if(line.includes("<include-block "))
 		{
 			refType = ReferenceType.IncludeBlock ;
-			name = this.definitionFinder.getAttributeValueXML("name", line);
+			name = this.definitionFinder.getAttributeValueXML("name", jsonXml);
 			isDeclaration = true ;
 		}
 		else 
 		{
 			refType = ReferenceType.Reference ;
-			name = this.definitionFinder.getAttributeValueXML("block", line);
+			name = this.definitionFinder.getAttributeValueXML("block", jsonXml);
 			isDeclaration = false ;
 		}
 
-		const createReference = (name !== ''); 
+		const createReference = (name); 
 
 		pr = null ;
 
@@ -177,7 +199,7 @@ export class ReferenceManager {
 	}
 
 	private isDeclarationWithName(line:string):boolean {
-		return (line.includes("<function ") || line.includes("<rule ") || line.includes("<group ")) ; 
+		return (line.includes("<function ") || line.includes("<rule ") || line.includes("<group ") || line.includes("<button ")) ; 
 	}
 
 	private determinDeclarationType(line:string) {
@@ -192,6 +214,9 @@ export class ReferenceManager {
 		else if(line.includes("<group ")) { 
 			refType = ReferenceType.Group;
 		}
+		else if(line.includes("<button ")) { 
+			refType = ReferenceType.Button;
+		}
 
 		return refType! ;
 	}
@@ -199,10 +224,11 @@ export class ReferenceManager {
 	private referenceToDeclarationWithName(line:string, docUri: string, lineNum: number):ProjectReference | null{
 		let pr : ProjectReference | null;
 
+		const jsonXml = this.definitionFinder.parseXML(line) ;
 		//Determine if it's a the type of definition rule/function/group 
 		const refType = this.determinDeclarationType(line) ;
-		const name = this.definitionFinder.getAttributeValueXML("name", line);
-		const createReference = (name !== '');
+		const name = this.definitionFinder.getAttributeValueXML("name", jsonXml);
+		const createReference = (name);
 		const isDeclaration = true;
 
 		pr = null ;
@@ -220,16 +246,22 @@ export class ReferenceManager {
 		const refType = ReferenceType.Reference;
 		let name = '' ;
 		
-		if(line.includes("rulename")) {
-			name = this.definitionFinder.getAttributeValueXML("rulename", line);
+		const jsonXml = this.definitionFinder.parseXML(line) ;
+
+		if(line.includes(" rulename")) {
+			name = this.definitionFinder.getAttributeValueXML("rulename", jsonXml);
 		}
-		else if (line.includes("function")) {
-			name = this.definitionFinder.getAttributeValueXML("function", line);
+		else if (line.includes(" function")) {
+			name = this.definitionFinder.getAttributeValueXML("function", jsonXml);
 		}
-		else if (line.includes("group")) {
-			name = this.definitionFinder.getAttributeValueXML("group", line);
+		else if (line.includes(" group")) {
+			name = this.definitionFinder.getAttributeValueXML("group", jsonXml);
 		}
-		const createReference = (name !== '');
+		else if (line.includes(" button")) {
+			name = this.definitionFinder.getAttributeValueXML("button", jsonXml);
+		}
+
+		const createReference = (name);
 		const isDeclaration = false;
 
 		pr = null ;

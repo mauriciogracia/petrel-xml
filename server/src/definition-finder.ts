@@ -1,8 +1,8 @@
 //import {CodeLens, CodeLensParams, Definition, Connection, Location, ReferenceParams, SymbolInformation, SymbolKind} from 'vscode-languageserver';
-import { Connection, Location, ReferenceParams, TextDocumentPositionParams, Range, TextDocuments, LocationLink } from 'vscode-languageserver';
+import { parse } from 'fast-xml-parser';
+import { Connection, Location, ReferenceParams, TextDocumentPositionParams, Range, TextDocuments, LocationLink, FileOperationPatternKind } from 'vscode-languageserver';
 import { Position } from 'vscode-languageserver-textdocument';
 import { ReferenceManager } from './reference-manager';
-
 import { Handler } from './util';
 
 /**
@@ -12,6 +12,19 @@ export default class DefinitionFinder extends Handler {
 	//reg expresion that matches the XML elements relevant to this extension
 	TokenSeparatorsXML = /[\t= <>"]/;
 	
+	//parsing options for the fast-xml-parser
+	xmlParseOptions = {
+		attributeNamePrefix : "",
+		ignoreAttributes : false,
+		ignoreNameSpace : true,
+		parseNodeValue : true,
+		parseAttributeValue : false,
+		trimValues: true,
+		parseTrueNumberOnly: false,
+		arrayMode: false, //"strict"
+		stopNodes: ["parse-me-as-string"]
+	};
+
 	constructor(
 		protected connection: Connection,
 		private refManager: ReferenceManager,
@@ -78,32 +91,34 @@ export default class DefinitionFinder extends Handler {
 		return symbol;
 	}
 
-	public getAttributeValueXML(attributeName: string, line: string): string {
-		let resp = '';
 
-		//extract the tokens from a single XML line
-		const tokens: string[] = line.split(this.TokenSeparatorsXML).filter(x => x);
-		
-		//look up the attribute by name and get the next token
-		let attIndex = tokens.indexOf(attributeName);
-		
-		if ((attIndex > 0) && (attIndex < tokens.length-1))
+	public parseXML(line: string) {
+		let jsonXML = '' ;
+
+		try { 
+			jsonXML = parse(line,this.xmlParseOptions) ;
+		}
+		catch
 		{
-			/* To handle this case : 
-			<action name="function" function="funABC" >
 
-			We need the function name...and not the value ("function") 
-			*/
-			if (tokens[attIndex - 1].toLowerCase() === "name") {
-				attIndex = tokens.indexOf(attributeName,attIndex+1);
-			}
-
-			if ((attIndex > 0) && (attIndex < tokens.length - 1)) {
-			
-				resp = tokens[attIndex + 1];
-			}
 		}
 
-		return resp;
+		return jsonXML ;
+	}
+
+	public getAttributeValueXML(attributeName: string, json: any): string {
+		let tagName = '' ;
+		let value = '' ;
+
+		if((json !== undefined) &&  Object.keys(json).length > 0)
+		{
+			tagName= Object.keys(json)[0] ;
+			if(tagName !== '')
+			{
+				value = json[tagName][attributeName] ;
+			}
+		} 
+		
+		return value ;
 	}
 }
