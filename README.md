@@ -19,7 +19,7 @@ Two options
 - Install it from https://marketplace.visualstudio.com/items?itemName=MauricioGraciaGutierrez.petrel-xml
 - From VScode Extensios (CTRL + SHIFT + X) search for `petrel-xml`
 
-Once is installed open your Petrel folder, right click on a the name of : rule, function , include block.. 
+Once is installed open your Petrel folder, right click on a the name of : rule, function , include block, Group, Buttons.. 
    - go to definition
    - find all references  
 
@@ -31,7 +31,7 @@ $ vsce package
 To publish the extension - https://code.visualstudio.com/api/working-with-extensions/publishing-extension
 $ vsce publish <versionNumber>
 
-If you are publishing for the fist time you need to setup personal access token and run $npm i -g vsce
+If you are publishing for the fist time you need to setup personal access token and run $npm i -g vsc
 
 This uses webpack and the .vscodeignore and package.json settings
 
