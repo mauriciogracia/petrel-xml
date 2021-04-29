@@ -97,10 +97,7 @@ export class ReferenceManager {
 
 	public async updateDocumentReferences(docUri: string) {
 		let allText: string;
-		let name:string;
-		let isDeclaration: boolean;
-		let createReference: boolean;
-		let refType: ReferenceType;
+		let pr: ProjectReference | null ;
 
 		this.removeDocumentReferences(docUri);
 
@@ -116,33 +113,106 @@ export class ReferenceManager {
 			console.log(`updating: ${docUri}`);
 
 			lines.forEach((line, i) => {
+				pr = null ;
+
 				if (line.includes("<function ") || line.includes("<rule ")) {
-					//Determine if it's a rule/function definition 
-					refType = line.includes("<rule ") ? ReferenceType.Rule : ReferenceType.Function;
-					name = this.definitionFinder.getAttributeValueXML("name", line);
-					createReference = (name !== '');
-					isDeclaration = true;
+					pr = this.referenceToFunctionRule(line,docUri,i+1) ;
+				}
+				else if (line.includes("<include-block ") || line.includes("<include ")) {
+					pr = this.referenceIncludeBlock(line,docUri, i+1) ;
 				}
 				else if (line.includes("<action ")) {
-					refType = ReferenceType.Call;
-					name = this.definitionFinder.getAttributeValueXML("rulename", line);
-					if (name.length == 0) {
-						name = this.definitionFinder.getAttributeValueXML("function", line);
-					}
-					createReference = (name !== '');
-					isDeclaration = false;
-				}
-				else {
-					createReference = false;
+					pr = this.referenceFromActionCall(line,docUri, i+1) ;
 				}
 
-				if (createReference) {
-					const pr: ProjectReference = new ProjectReference(refType, name, isDeclaration, docUri, i + 1, this.projectFolder);
-					this.refs.push(pr);
-					console.log(`${pr}`);
+				if (pr != null) {
+					this.addProjectReference(pr);
 				}
 			});
 		}
+	}
+
+	private addProjectReference(pr: ProjectReference) {
+		this.refs.push(pr);
+		console.log(`${pr}`);	
+	}
+
+	private referenceIncludeBlock(line:string, docUri: string, lineNum: number):ProjectReference | null{
+		let pr : ProjectReference | null;
+		let isDeclaration: boolean;
+		let refType : ReferenceType;
+		let name: string;
+
+		/* Determine if it's declaration of an include block or is being used
+
+		Declaration
+		<include-block name="OEHRMasterTypes" meta-name="node">
+		
+		Usage 
+		<include include-once="yes" block="OEHRMasterTypes"/>
+		*/
+
+		if(line.includes("<include-block "))
+		{
+			refType = ReferenceType.IncludeBlock ;
+			name = this.definitionFinder.getAttributeValueXML("name", line);
+			isDeclaration = true ;
+		}
+		else 
+		{
+			refType = ReferenceType.Reference ;
+			name = this.definitionFinder.getAttributeValueXML("block", line);
+			isDeclaration = false ;
+		}
+
+		const createReference = (name !== ''); 
+
+		pr = null ;
+
+		if (createReference) {
+			pr = new ProjectReference(refType, name, isDeclaration, docUri, lineNum, this.projectFolder);
+		}
+
+		return pr ;
+	}
+
+	private referenceToFunctionRule(line:string, docUri: string, lineNum: number):ProjectReference | null{
+		let pr : ProjectReference | null;
+
+		//Determine if it's a rule/function definition 
+		const refType = line.includes("<rule ") ? ReferenceType.Rule : ReferenceType.Function;
+		const name = this.definitionFinder.getAttributeValueXML("name", line);
+		const createReference = (name !== '');
+		const isDeclaration = true;
+
+		pr = null ;
+
+		if (createReference) {
+			pr = new ProjectReference(refType, name, isDeclaration, docUri, lineNum, this.projectFolder);
+		}
+
+		return pr ;
+	}
+
+	private referenceFromActionCall(line:string, docUri: string, lineNum: number){
+		let pr : ProjectReference | null;
+
+		const refType = ReferenceType.Reference;
+		let name = this.definitionFinder.getAttributeValueXML("rulename", line);
+
+		if (name.length == 0) {
+			name = this.definitionFinder.getAttributeValueXML("function", line);
+		}
+		const createReference = (name !== '');
+		const isDeclaration = false;
+
+		pr = null ;
+
+		if (createReference) {
+			pr = new ProjectReference(refType, name, isDeclaration, docUri, lineNum, this.projectFolder);
+		}
+
+		return pr ;
 	}
 
 	public removeDocumentReferences(docUri: string) {
@@ -174,7 +244,7 @@ export class ReferenceManager {
 		const defLocs = this.refs.filter(r => r.name.toUpperCase() == text.trim().toUpperCase())
 			.map((pr) =>
 			{
-				return this.ReferenceToLocation(pr);
+				return this.convertProjectReferenceToLocation(pr);
 			}
 		);
 
@@ -188,14 +258,14 @@ export class ReferenceManager {
 		const defLocs = this.refs.filter(r => (r.isDeclaration == true) && r.name.toUpperCase() == text.trim().toUpperCase())
 			.map((pr) =>
 			{
-				return this.ReferenceToLocationLink(pr);
+				return this.convertProjectReferenceToLocationLink(pr);
 			}
 		);
 
 		return defLocs;
 	}
 
-	public ReferenceToLocation(pr: ProjectReference): Location {
+	public convertProjectReferenceToLocation(pr: ProjectReference): Location {
 		const loc: Location = {
 			range: {
 				start: { line: pr.line-1, character: 0 },
@@ -206,7 +276,7 @@ export class ReferenceManager {
 		return loc;
 	}
 
-	public ReferenceToLocationLink(pr: ProjectReference): LocationLink {
+	public convertProjectReferenceToLocationLink(pr: ProjectReference): LocationLink {
 		const locLink: LocationLink = {
 			targetRange: {
 				start: { line: pr.line-1, character: 0 },
