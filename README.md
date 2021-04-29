@@ -12,7 +12,7 @@ is finised a message `>>> petrel-xml extension is ready <<<`  will be shown
 - Show all references where a rule or function is being used
 - Provide autocomplete based on existing functions and rules
 - When XML files are added, renamed, relocated, deleted the change is detected and references are updated (including folder operations as well) - version 0.9.4 
-- Detect declarations and references to Include blocks and Groups
+- Detect declarations and references to IncludeBlocks, Groups and Buttons, use fast-xml-parser insted of parsing line by hand - version 0.9.5
 
 ## Installing 
 Two options

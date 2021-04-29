@@ -40,8 +40,10 @@ X Detect file or folder structure changes and update references:
 - Remove warning from "Buffer" usage
 
 / Also detect definitions and usages for:
-	X include blocks
+	X include blocks and include-block1
 	X groups
+	X buttons
+	- fields 
 	- set-var/clear-var 
 	- output (they behave as variable declarations)
 	- infosets
