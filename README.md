@@ -12,19 +12,20 @@ is finised a message `>>> petrel-xml extension is ready <<<`  will be shown
 - Show all references where a rule or function is being used
 - Provide autocomplete based on existing functions and rules
 - When XML files are added, renamed, relocated, deleted the change is detected and references are updated (including folder operations as well) - version 0.9.4 
+- Detect declarations and references to Include blocks and Groups
 
 ## Installing 
 Two options
 - Install it from https://marketplace.visualstudio.com/items?itemName=MauricioGraciaGutierrez.petrel-xml
-- From VScode Extension (CTRL+SHIFT+X) search for `petrel-xml`
+- From VScode Extensios (CTRL + SHIFT + X) search for `petrel-xml`
 
-Once is installed open your Petrel folder, right click on a rule or function name 
+Once is installed open your Petrel folder, right click on a the name of : rule, function , include block.. 
    - go to definition
    - find all references  
 
 # If you are interested in maintining and improving this extension continue reading
 
-To package the extesion
+To package the extension
 $ vsce package
 
 To publish the extension - https://code.visualstudio.com/api/working-with-extensions/publishing-extension

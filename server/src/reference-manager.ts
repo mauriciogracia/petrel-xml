@@ -115,14 +115,14 @@ export class ReferenceManager {
 			lines.forEach((line, i) => {
 				pr = null ;
 
-				if (line.includes("<function ") || line.includes("<rule ")) {
-					pr = this.referenceToFunctionRule(line,docUri,i+1) ;
+				if (this.isDeclarationWithName(line)) {
+					pr = this.referenceToDeclarationWithName(line,docUri,i+1) ;
 				}
 				else if (line.includes("<include-block ") || line.includes("<include ")) {
 					pr = this.referenceIncludeBlock(line,docUri, i+1) ;
 				}
 				else if (line.includes("<action ")) {
-					pr = this.referenceFromActionCall(line,docUri, i+1) ;
+					pr = this.referenceFromAction(line,docUri, i+1) ;
 				}
 
 				if (pr != null) {
@@ -176,11 +176,31 @@ export class ReferenceManager {
 		return pr ;
 	}
 
-	private referenceToFunctionRule(line:string, docUri: string, lineNum: number):ProjectReference | null{
+	private isDeclarationWithName(line:string):boolean {
+		return (line.includes("<function ") || line.includes("<rule ") || line.includes("<group ")) ; 
+	}
+
+	private determinDeclarationType(line:string) {
+		let refType: ReferenceType ;
+
+		if(line.includes("<rule ")) {
+			refType = ReferenceType.Rule ;
+		}
+		else if(line.includes("<function ")) { 
+			refType = ReferenceType.Function;
+		}
+		else if(line.includes("<group ")) { 
+			refType = ReferenceType.Group;
+		}
+
+		return refType! ;
+	}
+
+	private referenceToDeclarationWithName(line:string, docUri: string, lineNum: number):ProjectReference | null{
 		let pr : ProjectReference | null;
 
-		//Determine if it's a rule/function definition 
-		const refType = line.includes("<rule ") ? ReferenceType.Rule : ReferenceType.Function;
+		//Determine if it's a the type of definition rule/function/group 
+		const refType = this.determinDeclarationType(line) ;
 		const name = this.definitionFinder.getAttributeValueXML("name", line);
 		const createReference = (name !== '');
 		const isDeclaration = true;
@@ -194,14 +214,20 @@ export class ReferenceManager {
 		return pr ;
 	}
 
-	private referenceFromActionCall(line:string, docUri: string, lineNum: number){
+	private referenceFromAction(line:string, docUri: string, lineNum: number){
 		let pr : ProjectReference | null;
 
 		const refType = ReferenceType.Reference;
-		let name = this.definitionFinder.getAttributeValueXML("rulename", line);
-
-		if (name.length == 0) {
+		let name = '' ;
+		
+		if(line.includes("rulename")) {
+			name = this.definitionFinder.getAttributeValueXML("rulename", line);
+		}
+		else if (line.includes("function")) {
 			name = this.definitionFinder.getAttributeValueXML("function", line);
+		}
+		else if (line.includes("group")) {
+			name = this.definitionFinder.getAttributeValueXML("group", line);
 		}
 		const createReference = (name !== '');
 		const isDeclaration = false;
@@ -215,6 +241,11 @@ export class ReferenceManager {
 		return pr ;
 	}
 
+	/**
+	 * Remove all references to the especified docUri
+	 * 
+	 * @param docUri 
+	 */
 	public removeDocumentReferences(docUri: string) {
 		let removedRefs;
 
@@ -223,7 +254,7 @@ export class ReferenceManager {
 		if (this.refs.some(pr => pr.fileUri === docUri)) {
 
 			removedRefs = this.refs.length;
-			//remove all references to the especified docUri 
+			
 			this.refs = this.refs.filter(pr => pr.fileUri !== docUri);
 
 			const index = this.referencedDocs.indexOf(docUri);

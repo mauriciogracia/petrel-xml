@@ -39,11 +39,12 @@ X Detect file or folder structure changes and update references:
 
 - Remove warning from "Buffer" usage
 
-- Also detect definitions and usages for:
+/ Also detect definitions and usages for:
+	X include blocks
+	X groups
 	- set-var/clear-var 
-	- include blocks
-	- infosets
 	- output (they behave as variable declarations)
+	- infosets
 
 X Deploy the Extension
 	X Package and Publish the extension - https://code.visualstudio.com/api/working-with-extensions/publishing-extension
