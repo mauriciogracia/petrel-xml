@@ -31,6 +31,8 @@ $ vsce package
 To publish the extension - https://code.visualstudio.com/api/working-with-extensions/publishing-extension
 $ vsce publish <versionNumber>
 
+If you are publishing for the fist time you need to setup personal access token and run $npm i -g vsce
+
 This uses webpack and the .vscodeignore and package.json settings
 
 ## Running and Debugging from VS code

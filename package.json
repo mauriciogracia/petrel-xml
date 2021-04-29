@@ -68,6 +68,7 @@
 		"webpack-cli": "^4.6.0"
 	},
 	"dependencies": {
-		"fast-xml-parser": "^3.19.0"
+		"fast-xml-parser": "^3.19.0",
+		"vsce": "^1.87.1"
 	}
 }
