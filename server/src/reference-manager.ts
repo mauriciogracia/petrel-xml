@@ -133,7 +133,12 @@ export class ReferenceManager {
 					if (this.isDeclarationWithName(line)) {
 						pr = this.referenceToDeclarationWithName(line,docUri,i+1) ;
 					}
-					else if (line.includes("<include-block ") || line.includes("<include ")) {
+					/*  TODO: Unhandle case for include blocks
+						
+						<CForm Name="OEHRCodingObjEyeExam" CFormType="OptometryRelated" BaseView="OEHRCoding" BackendTypeName="OEHRCodingEyeExam" ViewName="OEHRCodingObjEyeExam" ExistingBackend="1" Toolbar="O-BaseToolbar" StartingMode="view" Description="OEHRCodingObjEyeExam" FrontendType="Views" BeforeLoadingTheDataFunction="Utilities.Controller.Controller" ViewArgumentName="OEHRCodingObjEyeExamIID" CFormButtonsType="NormalButtons" NrOfAttachments="10" CFormIdentifier="3fb15893-2f0a-4806-be14-488e9b80ae8a" 
+						AttributeIncludeBlock="RelationTypeExamViewObjAttributes" Application="O-EHR">
+					*/
+					else if (line.includes("<include-block ") || line.includes("<include-block1 ") || line.includes("<include ") || line.includes("<include1 ")) {
 						pr = this.referenceIncludeBlock(line,docUri, i+1) ;
 					}
 					else if (line.includes("<action ")) {
@@ -174,14 +179,14 @@ export class ReferenceManager {
 		*/
 		const jsonXml = this.definitionFinder.parseXML(line) ;
 
-		if(line.includes("<include-block "))
+		if(line.includes("<include-block ") || line.includes("<include-block1 "))
 		{
 			refType = ReferenceType.IncludeBlock ;
 			name = this.definitionFinder.getAttributeValueXML("name", jsonXml);
 			isDeclaration = true ;
 		}
 		else 
-		{
+		{ 
 			refType = ReferenceType.Reference ;
 			name = this.definitionFinder.getAttributeValueXML("block", jsonXml);
 			isDeclaration = false ;
