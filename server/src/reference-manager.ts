@@ -96,13 +96,11 @@ export class ReferenceManager {
 
 	public async updateDocumentReferences(docUri: string) {
 		let allText: string;
-		let pr: ProjectReference | null ;
+		let projectReference: ProjectReference | null ;
 		let isCommentSection : boolean;
 		let singleLineComment : boolean;
 
 		this.removeDocumentReferences(docUri);
-
-		//await this.checkWorkspaceChanges();
 
 		allText = this.getAllDocumentText(docUri);
 
@@ -114,10 +112,10 @@ export class ReferenceManager {
 			isCommentSection = false ;
 			
 			lines.forEach((line, i) => {
-				pr = null ;
+				projectReference = null ;
 				singleLineComment = false ;
 
-				if(line.includes("<!--") && line.includes("-->"))
+				if(this.isSingleLineCommentXML(line))
 				{
 					singleLineComment = true ; 
 				}
@@ -131,52 +129,59 @@ export class ReferenceManager {
 				if(	!isCommentSection && !singleLineComment)
 				{
 					if (this.isDeclarationWithName(line)) {
-						pr = this.referenceToDeclarationWithName(line,docUri,i+1) ;
+						projectReference = this.referenceToDeclarationWithName(line,docUri,i+1) ;
 					}
-					/*  TODO: Unhandle case for include blocks
-						
-						<CForm Name="OEHRCodingObjEyeExam" CFormType="OptometryRelated" BaseView="OEHRCoding" BackendTypeName="OEHRCodingEyeExam" ViewName="OEHRCodingObjEyeExam" ExistingBackend="1" Toolbar="O-BaseToolbar" StartingMode="view" Description="OEHRCodingObjEyeExam" FrontendType="Views" BeforeLoadingTheDataFunction="Utilities.Controller.Controller" ViewArgumentName="OEHRCodingObjEyeExamIID" CFormButtonsType="NormalButtons" NrOfAttachments="10" CFormIdentifier="3fb15893-2f0a-4806-be14-488e9b80ae8a" 
-						AttributeIncludeBlock="RelationTypeExamViewObjAttributes" Application="O-EHR">
-					*/
-					else if (line.includes("<include-block ") || line.includes("<include-block1 ") || line.includes("<include ") || line.includes("<include1 ")) {
-						pr = this.referenceIncludeBlock(line,docUri, i+1) ;
+					
+					else if (this.isIncludeReference(line)) {
+						projectReference = this.referenceIncludeBlock(line,docUri, i+1) ;
 					}
 					else if (line.includes("<action ")) {
-						pr = this.referenceFromAction(line,docUri, i+1) ;
+						projectReference = this.referenceFromAction(line,docUri, i+1) ;
 					}
 
-					if (pr != null) {
-						this.addProjectReference(pr);
+					if (projectReference != null) {
+						this.addProjectReference(projectReference);
 					}
 				}
 
-				if (line.includes("-->") && !line.includes("<!--") ) {
+				if (this.isEndOfBlockCommentXML(line)) {
 					isCommentSection = false ;
 				}
 			});
 		}
 	}
 
+	private isSingleLineCommentXML(line:string):boolean {
+		return (line.includes("<!--") && line.includes("-->")) ;
+	}
 
-	private addProjectReference(pr: ProjectReference) {
-		this.refs.push(pr);
-		console.log(`${pr}`);	
+	private isEndOfBlockCommentXML(line:string):boolean {
+		return (line.includes("-->") && !line.includes("<!--")) ;
+	}
+
+	tagsWithNameAttribute = ["<function ", "<rule ", "<group ", "<button ","<set-var ", "<clear-var "];
+
+	private isDeclarationWithName(line:string):boolean {
+		return this.tagsWithNameAttribute.some(tag => line.includes(tag));
+	}
+
+	tagsRelatedToInclude = ["<include-block ", "<include-block1 ", "<include ", "<include1 "];
+
+	private isIncludeReference(line:string):boolean {
+		return this.tagsRelatedToInclude.some(tag => line.includes(tag));
+	}
+
+	private addProjectReference(projectReference: ProjectReference) {
+		this.refs.push(projectReference);
+		console.log(`${projectReference}`);	
 	}
 
 	private referenceIncludeBlock(line:string, docUri: string, lineNum: number):ProjectReference | null{
-		let pr : ProjectReference | null;
+		let projectReference : ProjectReference | null;
 		let isDeclaration: boolean;
 		let refType : ReferenceType;
 		let name: string;
 
-		/* Determine if it's declaration of an include block or is being used
-
-		Declaration
-		<include-block name="OEHRMasterTypes" meta-name="node">
-		
-		Usage 
-		<include include-once="yes" block="OEHRMasterTypes"/>
-		*/
 		const jsonXml = this.definitionFinder.parseXML(line) ;
 
 		if(line.includes("<include-block ") || line.includes("<include-block1 "))
@@ -194,19 +199,21 @@ export class ReferenceManager {
 
 		const createReference = (name); 
 
-		pr = null ;
+		projectReference = null ;
 
 		if (createReference) {
-			pr = new ProjectReference(refType, name, isDeclaration, docUri, lineNum, this.projectFolder);
+			projectReference = new ProjectReference(refType, name, isDeclaration, docUri, lineNum, this.projectFolder);
 		}
 
-		return pr ;
+		return projectReference ;
 	}
 
-	private isDeclarationWithName(line:string):boolean {
-		return (line.includes("<function ") || line.includes("<rule ") || line.includes("<group ") || line.includes("<button ")) ; 
-	}
-
+	/**
+	 * Determine if it's a the type of definition rule/function/group 
+	 * 
+	 * @param line 
+	 * @returns 
+	 */
 	private determinDeclarationType(line:string) {
 		let refType: ReferenceType ;
 
@@ -222,31 +229,33 @@ export class ReferenceManager {
 		else if(line.includes("<button ")) { 
 			refType = ReferenceType.Button;
 		}
+		else if(line.includes("<set-var ") || line.includes("<clear-var ")) { 
+			refType = ReferenceType.Variable;
+		}
 
 		return refType! ;
 	}
 
 	private referenceToDeclarationWithName(line:string, docUri: string, lineNum: number):ProjectReference | null{
-		let pr : ProjectReference | null;
+		let projectReference : ProjectReference | null;
 
 		const jsonXml = this.definitionFinder.parseXML(line) ;
-		//Determine if it's a the type of definition rule/function/group 
 		const refType = this.determinDeclarationType(line) ;
 		const name = this.definitionFinder.getAttributeValueXML("name", jsonXml);
 		const createReference = (name);
 		const isDeclaration = true;
 
-		pr = null ;
+		projectReference = null ;
 
 		if (createReference) {
-			pr = new ProjectReference(refType, name, isDeclaration, docUri, lineNum, this.projectFolder);
+			projectReference = new ProjectReference(refType, name, isDeclaration, docUri, lineNum, this.projectFolder);
 		}
 
-		return pr ;
+		return projectReference ;
 	}
 
 	private referenceFromAction(line:string, docUri: string, lineNum: number){
-		let pr : ProjectReference | null;
+		let projectReference : ProjectReference | null;
 
 		const refType = ReferenceType.Reference;
 		let name = '' ;
@@ -269,13 +278,13 @@ export class ReferenceManager {
 		const createReference = (name);
 		const isDeclaration = false;
 
-		pr = null ;
+		projectReference = null ;
 
 		if (createReference) {
-			pr = new ProjectReference(refType, name, isDeclaration, docUri, lineNum, this.projectFolder);
+			projectReference = new ProjectReference(refType, name, isDeclaration, docUri, lineNum, this.projectFolder);
 		}
 
-		return pr ;
+		return projectReference ;
 	}
 
 	/**
@@ -288,11 +297,11 @@ export class ReferenceManager {
 
 		removedRefs = 0;
 
-		if (this.refs.some(pr => pr.fileUri === docUri)) {
+		if (this.refs.some(projectReference => projectReference.fileUri === docUri)) {
 
 			removedRefs = this.refs.length;
 			
-			this.refs = this.refs.filter(pr => pr.fileUri !== docUri);
+			this.refs = this.refs.filter(projectReference => projectReference.fileUri !== docUri);
 
 			const index = this.referencedDocs.indexOf(docUri);
 			if (index > -1) {
@@ -310,9 +319,9 @@ export class ReferenceManager {
 		await this.checkWorkspaceChanges();
 
 		const defLocs = this.refs.filter(r => r.name.toUpperCase() == text.trim().toUpperCase())
-			.map((pr) =>
+			.map((projectReference) =>
 			{
-				return this.convertProjectReferenceToLocation(pr);
+				return this.convertProjectReferenceToLocation(projectReference);
 			}
 		);
 
@@ -324,38 +333,38 @@ export class ReferenceManager {
 		await this.checkWorkspaceChanges();
 
 		const defLocs = this.refs.filter(r => (r.isDeclaration == true) && r.name.toUpperCase() == text.trim().toUpperCase())
-			.map((pr) =>
+			.map((projectReference) =>
 			{
-				return this.convertProjectReferenceToLocationLink(pr);
+				return this.convertProjectReferenceToLocationLink(projectReference);
 			}
 		);
 
 		return defLocs;
 	}
 
-	public convertProjectReferenceToLocation(pr: ProjectReference): Location {
+	public convertProjectReferenceToLocation(projectReference: ProjectReference): Location {
 		const loc: Location = {
 			range: {
-				start: { line: pr.line-1, character: 0 },
-				end : { line: pr.line, character : 0 }
+				start: { line: projectReference.line-1, character: 0 },
+				end : { line: projectReference.line, character : 0 }
 			},
-			uri: pr.fileUri ,
+			uri: projectReference.fileUri ,
 		};
 		return loc;
 	}
 
-	public convertProjectReferenceToLocationLink(pr: ProjectReference): LocationLink {
+	public convertProjectReferenceToLocationLink(projectReference: ProjectReference): LocationLink {
 		const locLink: LocationLink = {
 			targetRange: {
-				start: { line: pr.line-1, character: 0 },
-				end : { line: pr.line, character : 0 }
+				start: { line: projectReference.line-1, character: 0 },
+				end : { line: projectReference.line, character : 0 }
 			},
 			targetSelectionRange:
 			{
-				start: { line: pr.line-1, character: 0 },
-				end : { line: pr.line, character : 0 }
+				start: { line: projectReference.line-1, character: 0 },
+				end : { line: projectReference.line, character : 0 }
 			},
-			targetUri: pr.fileUri,
+			targetUri: projectReference.fileUri,
 			/* the API by default selects the word as the origin range and adds the link to it
 			originSelectionRange: {
 				start: { line: textPosition.position.line, character: textPosition.position.character-5 },

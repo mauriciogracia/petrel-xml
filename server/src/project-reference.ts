@@ -39,8 +39,6 @@ export class ProjectReference {
 			fileUri = this.fileUri;
 		}
 		
-		//const fileUri = this.fileUri;
-
 		const resp = `ProjectReference = {type:${this.type}, name:${this.name}, isDeclaration:${this.isDeclaration}, fileUri:${fileUri}, line:${this.line}`;
 
 		return resp;

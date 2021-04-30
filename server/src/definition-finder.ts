@@ -93,14 +93,14 @@ export default class DefinitionFinder extends Handler {
 
 
 	public parseXML(line: string) {
-		let jsonXML = '' ;
+		let jsonXML ;
 
 		try { 
 			jsonXML = parse(line,this.xmlParseOptions) ;
 		}
 		catch
 		{
-
+			jsonXML = '' ;
 		}
 
 		return jsonXML ;
