@@ -6,5 +6,6 @@ export enum ReferenceType {
 	Group = "Group",
 	Button = "Button",
 	Variable = "Variable",
+	View = "View",
 	Reference = "Reference"
 }

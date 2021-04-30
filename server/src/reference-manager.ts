@@ -131,11 +131,10 @@ export class ReferenceManager {
 					if (this.isDeclarationWithName(line)) {
 						projectReference = this.referenceToDeclarationWithName(line,docUri,i+1) ;
 					}
-					
 					else if (this.isIncludeReference(line)) {
 						projectReference = this.referenceIncludeBlock(line,docUri, i+1) ;
 					}
-					else if (line.includes("<action ")) {
+					else if (this.isActionCall(line)) {
 						projectReference = this.referenceFromAction(line,docUri, i+1) ;
 					}
 
@@ -151,6 +150,10 @@ export class ReferenceManager {
 		}
 	}
 
+	private isActionCall(line:string):boolean {
+		return line.includes("<action ") ;
+	}
+
 	private isSingleLineCommentXML(line:string):boolean {
 		return (line.includes("<!--") && line.includes("-->")) ;
 	}
@@ -159,7 +162,7 @@ export class ReferenceManager {
 		return (line.includes("-->") && !line.includes("<!--")) ;
 	}
 
-	tagsWithNameAttribute = ["<function ", "<rule ", "<group ", "<button ","<set-var ", "<clear-var "];
+	tagsWithNameAttribute = ["<function ", "<rule ", "<group ", "<button ","<set-var ", "<clear-var ","<view "];
 
 	private isDeclarationWithName(line:string):boolean {
 		return this.tagsWithNameAttribute.some(tag => line.includes(tag));
@@ -232,6 +235,9 @@ export class ReferenceManager {
 		else if(line.includes("<set-var ") || line.includes("<clear-var ")) { 
 			refType = ReferenceType.Variable;
 		}
+		else if(line.includes("<view ")) { 
+			refType = ReferenceType.View;
+		}
 
 		return refType! ;
 	}
@@ -273,6 +279,9 @@ export class ReferenceManager {
 		}
 		else if (line.includes(" button")) {
 			name = this.definitionFinder.getAttributeValueXML("button", jsonXml);
+		}
+		else if (line.includes(" target-view")) {
+			name = this.definitionFinder.getAttributeValueXML("target-view", jsonXml);
 		}
 
 		const createReference = (name);
