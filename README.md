@@ -13,15 +13,17 @@ is finised a message `>>> petrel-xml extension is ready <<<`  will be shown
 - Provide autocomplete based on existing functions and rules
 - When XML files are added, renamed, relocated, deleted the change is detected and references are updated (including folder operations as well) - version 0.9.4 
 - Detect declarations and references to IncludeBlocks, Groups and Buttons, use fast-xml-parser insted of parsing line by hand - version 0.9.5
+- Detect set-var, clear-var, views and refresh actions on views - version 0.9.6
 
 ## Installing 
 Two options
 - Install it from https://marketplace.visualstudio.com/items?itemName=MauricioGraciaGutierrez.petrel-xml
 - From VScode Extensios (CTRL + SHIFT + X) search for `petrel-xml`
 
-Once is installed open your Petrel folder, right click on a the name of : rule, function , include block, Group, Buttons.. 
+Once is installed open your Petrel folder, right click on a the name of : rule, function , include block, Group, Buttons, etc.. 
    - go to definition
    - find all references  
+   - CRTL + SPACEBAR to get suggestion based on the name of rule, functions , include blocks, Groups, Buttons, etc.. 
 
 # If you are interested in maintining and improving this extension continue reading
 
@@ -31,7 +33,8 @@ $ vsce package
 To publish the extension - https://code.visualstudio.com/api/working-with-extensions/publishing-extension
 $ vsce publish <versionNumber>
 
-If you are publishing for the fist time you need to setup personal access token and run $npm i -g vsc
+If you are publishing for the fist time you need to setup personal access token and run 
+$ npm i -g vsc
 
 This uses webpack and the .vscodeignore and package.json settings
 
