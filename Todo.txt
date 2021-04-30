@@ -43,8 +43,9 @@ X Detect file or folder structure changes and update references:
 	X include blocks and include-block1
 	X groups
 	X buttons
+	X views 	
+	X set-var/clear-var 
 	- fields 
-	- set-var/clear-var 
 	- output (they behave as variable declarations)
 	- infosets
 
